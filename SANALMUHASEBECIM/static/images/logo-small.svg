@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="20" cy="20" r="20" fill="#0d6efd"/>
+    
+    <!-- SM letters -->
+    <text x="8" y="26" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="16">S</text>
+    <text x="18" y="26" fill="white" font-family="Arial, sans-serif" font-weight="bold" font-size="16">M</text>
+    
+    <!-- Company name -->
+    <text x="50" y="18" fill="#0d6efd" font-family="Arial, sans-serif" font-weight="bold" font-size="14">Sanal</text>
+    <text x="50" y="32" fill="#0d6efd" font-family="Arial, sans-serif" font-weight="bold" font-size="14">Muhasebecim</text>
+</svg>

@@ -1,0 +1,35 @@
+from flask import current_app
+
+@bp.route("/user/<int:user_id>/edit", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    form = EditUserForm(obj=user)  # <— mevcut değerlerle başlat
+
+    # Teşhis: POST geldi ama validate başarısızsa hataları gör
+    if request.method == 'POST' and not form.validate():
+        current_app.logger.warning(f"EditUserForm errors: {form.errors}")
+        current_app.logger.warning(f"Raw POST is_admin={request.form.get('is_admin')}")
+        flash('Form doğrulama hatası. Kutucuğu tekrar işaretleyip deneyin.', 'danger')
+
+    if form.validate_on_submit():
+        user.name = (form.name.data or '').strip()
+        user.email = (form.email.data or '').strip()
+        user.is_admin = bool(form.is_admin.data)  # <— WTForms'tan gelen değer
+
+        db.session.commit()
+        flash('Kullanıcı başarıyla güncellendi!', 'success')
+        return redirect(url_for('admin.users'))
+
+    # Ek güvenlik: validate başarısızsa da checkbox’ı elle okuyup kaydet (opsiyonel “fallback”)
+    if request.method == 'POST' and not form.validate():
+        user.name = (request.form.get('name') or '').strip()
+        user.email = (request.form.get('email') or '').strip()
+        # HTML checkbox işaretliyse bir değer döner (örn. 'y' veya 'on'); işaretli değilse None
+        user.is_admin = request.form.get('is_admin') is not None
+        db.session.commit()
+        flash('Kullanıcı başarıyla güncellendi! (fallback)', 'success')
+        return redirect(url_for('admin.users'))
+
+    return render_template('admin/edit_user.html', title='Kullanıcı Düzenle', form=form, user=user)

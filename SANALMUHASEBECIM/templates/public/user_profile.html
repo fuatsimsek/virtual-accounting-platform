@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.name }} - Profil{% endblock %}
+{% block content %}
+
+<!-- Profile Hero -->
+<section class="hero-section hero-services">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content" style="text-align:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+        {% if user.profile_photo %}
+        <img src="{{ user.profile_photo }}" alt="{{ user.name }}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.6);box-shadow:0 8px 30px rgba(0,0,0,0.25);">
+        {% else %}
+        <div style="width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,0.6);box-shadow:0 8px 30px rgba(0,0,0,0.25);">
+          <i class="fas fa-user" style="color:#fff;font-size:42px;"></i>
+        </div>
+        {% endif %}
+        <h1 class="hero-title" style="margin:0;">{{ user.name }}</h1>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-top:4px;">
+          {% if user.is_admin %}
+          <span class="badge" style="background:#10b981;color:#fff;padding:6px 10px;border-radius:999px;font-weight:700;">Yetkili</span>
+          {% else %}
+          <span class="badge" style="background:#64748b;color:#fff;padding:6px 10px;border-radius:999px;font-weight:700;">Üye</span>
+          {% endif %}
+          {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+          <span style="background:#0ea5e9;color:#ffffff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;">Kayıt: {% if user.created_at %}{{ '%02d'|format(user.created_at.day) }} {{ tr_months[user.created_at.month] }} {{ user.created_at.year }}{% else %}-{% endif %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    .hero-section.hero-services{padding:70px 0 40px}
+  </style>
+</section>
+
+<!-- Content -->
+<section class="services-grid-section">
+  <div class="container">
+    {% if user.is_admin %}
+    <div class="card" style="padding:24px;">
+      <h3 style="margin:0 0 16px 0;">Yazılar</h3>
+      {% if recent_posts %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
+        {% for p in recent_posts %}
+        <a href="{{ url_for('blog.post_detail', slug=p.slug) }}" style="text-decoration:none;">
+          <div style="border:1px solid #e2e8f0;border-radius:14px;padding:14px;height:100%;background:#fff;transition:all .2s ease;">
+            <div style="font-weight:700;color:#1f2937;margin-bottom:6px;">{{ p.title }}</div>
+            {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+            <div style="font-size:12px;color:#64748b;">{{ '%02d'|format((p.published_at or p.post_date).day) }} {{ tr_months[(p.published_at or p.post_date).month] }} {{ (p.published_at or p.post_date).year }}</div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="color:#64748b;">Henüz yayınlanmış yazı yok.</div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="card" style="padding:24px; position:relative;">
+      <h3 style="margin:0 0 16px 0;">Yorumlar</h3>
+      {% if recent_comments %}
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        {% for c in recent_comments %}
+        <a href="{{ url_for('blog.post_detail', slug=c.post.slug) }}#comment-{{ c.id }}" style="text-decoration:none;">
+          <div style="border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fff;">
+            {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+            <div style="font-size:13px;color:#64748b;margin-bottom:6px;">{{ '%02d'|format(c.date.day) }} {{ tr_months[c.date.month] }} {{ c.date.year }} {{ c.date.strftime('%H:%M') }}</div>
+            <div style="margin:2px 0;">
+              <span style="font-size:12px;color:#64748b;margin-right:6px;background:#eef2ff;color:#4f46e5;padding:2px 8px;border-radius:999px;font-weight:700;">Gönderi</span>
+              <span style="font-weight:700;color:#1f2937;">{{ c.post.title }}</span>
+            </div>
+            <div style="margin-top:6px;">
+              <span style="font-size:12px;color:#64748b;margin-right:6px;background:#ecfeff;color:#0e7490;padding:2px 8px;border-radius:999px;font-weight:700;">Yorum</span>
+              <span style="color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;vertical-align:bottom;">{{ c.content }}</span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="color:#64748b;">Henüz yorum yok.</div>
+      {% endif %}
+      
+    </div>
+  </div>
+  <style>
+    .card a:hover>div{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,0,0,0.06);border-color:#cbd5e1}
+  </style>
+</section>
+{% endblock %}
+

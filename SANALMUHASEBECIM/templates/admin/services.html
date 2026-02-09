@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Hizmet Yönetimi{% endblock %}
+{% block content %}
+<section class="section-padding">
+  <div class="container-custom">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Hizmetler</h1>
+      <div class="space-x-2">
+        <a class="btn-primary" href="{{ url_for('admin.new_service') }}">Yeni Hizmet</a>
+        <form method="post" action="{{ url_for('admin.seed_services') }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn-outline">Varsayılan Paketleri Yükle</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Bilgi Kutusu -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <i class="fas fa-info-circle text-blue-400 text-lg"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800">Hizmet Silme Hakkında</h3>
+                     <div class="mt-2 text-sm text-blue-700">
+             <p>• Hizmet silindiğinde bağlı hizmet talepleri ve müşteri kayıtları silinir</p>
+             <p>• Bağlı kayıt sayısı yüksek olan hizmetleri silmeden önce dikkatli düşünün</p>
+             <p>• Silme işlemi geri alınamaz</p>
+           </div>
+        </div>
+      </div>
+    </div>
+    <div class="card overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-gray-600"><th class="py-2 pr-4">Ad</th><th class="py-2 pr-4">Slug</th><th class="py-2 pr-4">Aktif</th><th class="py-2 pr-4">Sıra</th><th class="py-2 pr-4">Bağlı Kayıtlar</th><th class="py-2">İşlem</th></tr></thead>
+        <tbody>
+          {% for s in services.items %}
+          <tr class="border-t">
+            <td class="py-2 pr-4">{{ s.name }}</td>
+            <td class="py-2 pr-4">{{ s.slug }}</td>
+            <td class="py-2 pr-4">{{ 'Evet' if s.is_active else 'Hayır' }}</td>
+            <td class="py-2 pr-4">{{ s.order_index }}</td>
+                         <td class="py-2 pr-4">
+               {% if s.total_related > 0 %}
+                 <div class="text-xs text-gray-600">
+                   <div>Lead: {{ s.lead_count }}</div>
+                   <div>Talep: {{ s.service_request_count }}</div>
+                   <div class="font-semibold text-blue-600">Toplam: {{ s.total_related }}</div>
+                 </div>
+               {% else %}
+                 <span class="text-gray-400 text-xs">Bağlı kayıt yok</span>
+               {% endif %}
+             </td>
+            <td class="py-2 space-x-2">
+              <a class="btn-outline text-sm" href="{{ url_for('admin.edit_service', service_id=s.id) }}">Düzenle</a>
+              <form method="post" action="{{ url_for('admin.toggle_service_status', service_id=s.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn-outline text-sm">{{ 'Pasifleştir' if s.is_active else 'Aktifleştir' }}</button>
+              </form>
+              <form method="post" action="{{ url_for('admin.delete_service', service_id=s.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                 <button class="btn-outline text-sm" onclick="return confirm('Bu hizmeti silmek istediğinizden emin misiniz?\n\n⚠️ Dikkat: Hizmet silindiğinde:\n• Bağlı hizmet talepleri silinir\n• Bu taleplere bağlı müşteri kayıtları da silinir\n• Hizmet tamamen kaldırılır\n\nBu işlem geri alınamaz!')">Sil</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr class="border-t">
+            <td class="py-6 text-center text-gray-500" colspan="6">Henüz hizmet yok. Yukarıdan "Yeni Hizmet" ekleyin ya da "Varsayılan Paketleri Yükle" butonunu kullanın.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="mt-4 flex justify-between">
+        {% if services.has_prev %}<a class="btn-outline" href="{{ url_for('admin.services', page=services.prev_num) }}">Önceki</a>{% else %}<span></span>{% endif %}
+        {% if services.has_next %}<a class="btn-primary" href="{{ url_for('admin.services', page=services.next_num) }}">Sonraki</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

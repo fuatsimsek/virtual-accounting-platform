@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="post-header">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="post-category mb-3">
+                    <span class="badge bg-primary-soft">Blog</span>
+                </div>
+                <h1 class="post-title mb-4">{{ post.title }}</h1>
+                <p class="post-subtitle mb-4">{{ post.subtitle }}</p>
+                <div class="post-meta d-flex align-items-center">
+                    <div class="post-author d-flex align-items-center me-4">
+                        <div class="author-avatar me-3">
+                            <i class="fas fa-user-circle fa-2x text-primary"></i>
+                        </div>
+                        <div class="author-info">
+                            <div class="author-name fw-semibold">{{ post.author.name }}</div>
+                            <div class="post-date text-muted small">{{ post.post_date.strftime('%d %B %Y') }}</div>
+                        </div>
+                    </div>
+                    <div class="post-stats d-flex align-items-center">
+                        <div class="stat-item me-3">
+                            <i class="far fa-clock me-1"></i>
+                            <span>{% set word_count = post.post_text.split()|length %}{% set reading_time = (word_count / 200)|round|int %}{% if reading_time < 1 %}1{% else %}{{ reading_time }}{% endif %} dk okuma</span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="far fa-comment me-1"></i>
+                            <span>{{ post.comments|length }} yorum</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.post-header {
+    padding: 5rem 0 3rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 3rem;
+}
+
+.post-category .badge {
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.post-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+}
+
+.post-subtitle {
+    font-size: 1.35rem;
+    color: #4a5568;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+.post-meta {
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.author-info {
+    line-height: 1.2;
+}
+
+.author-name {
+    color: #2d3748;
+    font-size: 0.95rem;
+}
+
+.post-date {
+    font-size: 0.85rem;
+}
+
+.post-stats {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+}
+
+.stat-item i {
+    color: #0d6efd;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .post-header {
+        padding: 3rem 0 2rem;
+    }
+    
+    .post-title {
+        font-size: 2.2rem;
+    }
+    
+    .post-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .post-author {
+        margin-bottom: 1rem;
+    }
+    
+    .post-stats {
+        margin-top: 0.5rem;
+    }
+}
+</style>
+
+<!-- Post Content-->
+<article class="mb-5">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} shadow-sm rounded-3 mb-4">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                <div class="post-content card border-0 shadow-sm rounded-4 p-4 mb-5">
+                    <div class="content-text">{{ post.post_text }}</div>
+                </div>
+
+                <!-- Like Button -->
+                {% if current_user.is_authenticated %}
+                <div class="post-actions mb-5">
+                    <button class="btn {% if current_user in post.likes|map(attribute='user') %}btn-primary{% else %}btn-outline-primary{% endif %} like-btn rounded-pill px-4 py-2 shadow-sm" data-post-id="{{ post.id }}">
+                        <i class="fas fa-heart"></i> <span class="like-count">{{ post.likes|length }}</span>
+                    </button>
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-5 shadow-sm rounded-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Beğeni yapmak için <a href="{{ url_for('login') }}" class="alert-link">giriş yapın</a>.
+                </div>
+                {% endif %}
+
+                <!-- Comments Section -->
+                <div class="comments-section card border-0 shadow-sm rounded-4 p-4">
+                    <h3 class="section-title mb-4">
+                        <i class="far fa-comments me-2"></i>
+                        Yorumlar
+                        <span class="comment-count text-muted">({{ post.comments|length }})</span>
+                    </h3>
+                    
+                    {% if current_user.is_authenticated %}
+                    <form method="POST" class="comment-form mb-4">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group mb-3">
+                            {{ form.content(class="form-control rounded-3 shadow-sm", rows=3, placeholder="Yorumunuzu yazın...") }}
+                        </div>
+                        {{ form.submit(class="btn btn-primary rounded-pill px-4 py-2 shadow-sm") }}
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info mb-4 shadow-sm rounded-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Yorum yapmak için <a href="{{ url_for('login') }}" class="alert-link">giriş yapın</a>.
+                    </div>
+                    {% endif %}
+
+                    <div class="comments-list">
+                        {% for comment in post.comments if not comment.parent_id %}
+                        <div class="comment card border-0 shadow-sm rounded-4 p-3 mb-4" id="comment-{{ comment.id }}">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 fw-semibold">{{ comment.author.name }}</h6>
+                                        <small class="text-muted">{{ comment.date.strftime('%d %B %Y %H:%M') }}</small>
+                                    </div>
+                                    <p class="comment-text mb-3">{{ comment.content }}</p>
+                                    
+                                    {% if current_user.is_authenticated %}
+                                    <div class="comment-actions d-flex align-items-center">
+                                        <button class="btn btn-sm {% if current_user in comment.likes|map(attribute='user') %}btn-primary{% else %}btn-outline-primary{% endif %} like-comment rounded-pill px-3 py-1 shadow-sm me-2" data-comment-id="{{ comment.id }}">
+                                            <i class="fas fa-heart"></i> <span class="like-count">{{ comment.likes|length }}</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary reply-comment rounded-pill px-3 py-1 shadow-sm" data-comment-id="{{ comment.id }}">
+                                            <i class="fas fa-reply"></i> Yanıtla
+                                        </button>
+                                    </div>
+                                    <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                        <textarea class="form-control mb-2 rounded-3 shadow-sm" rows="2" placeholder="Yanıtınızı yazın..."></textarea>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-primary submit-reply rounded-pill px-3 py-1" data-comment-id="{{ comment.id }}">Yanıtla</button>
+                                            <button class="btn btn-sm btn-secondary cancel-reply rounded-pill px-3 py-1" data-comment-id="{{ comment.id }}">İptal</button>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="replies ms-4 mt-3">
+                                        {% for reply in comment.replies %}
+                                        <div class="reply card border-0 shadow-sm rounded-4 p-3 mb-3" id="comment-{{ reply.id }}">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <h6 class="mb-0 fw-semibold">{{ reply.user.name }}</h6>
+                                                        <small class="text-muted">{{ reply.date.strftime('%d %B %Y %H:%M') }}</small>
+                                                    </div>
+                                                    <p class="comment-text mb-3">{{ reply.content }}</p>
+                                                    {% if current_user.is_authenticated %}
+                                                    <div class="comment-actions">
+                                                        <button class="btn btn-sm {% if current_user in reply.likes|map(attribute='user') %}btn-primary{% else %}btn-outline-primary{% endif %} like-comment rounded-pill px-3 py-1 shadow-sm" data-comment-id="{{ reply.id }}">
+                                                            <i class="fas fa-heart"></i> <span class="like-count">{{ reply.likes|length }}</span>
+                                                        </button>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if post.user == current_user %}
+                <div class="post-actions d-flex justify-content-end gap-2 mt-4">
+                    <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-outline-secondary rounded-pill px-4 py-2 shadow-sm">
+                        <i class="fas fa-edit me-2"></i> Düzenle
+                    </a>
+                    <form id="deleteForm" action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" class="m-0">
+                        <button type="button" id="deleteBtn" class="btn btn-outline-danger rounded-pill px-4 py-2 shadow-sm">
+                            <i class="fas fa-trash-alt me-2"></i> Sil
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</article>
+
+<style>
+/* Post Content Styles */
+.post-content {
+    background: #ffffff;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #2d3748;
+}
+
+.content-text {
+    white-space: pre-line;
+}
+
+/* Comments Section Styles */
+.section-title {
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.comment-count {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.comment-form textarea {
+    border: 1px solid #e2e8f0;
+    resize: none;
+}
+
+.comment-form textarea:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.comment-text {
+    color: #4a5568;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Like Button Animation */
+.heart-animate {
+    animation: pop 0.3s;
+    filter: drop-shadow(0 0 6px #0d6efd);
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .post-content {
+        font-size: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .comments-section {
+        padding: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .comment-text {
+        font-size: 0.95rem;
+    }
+}
+</style>
+
+{% endblock %}

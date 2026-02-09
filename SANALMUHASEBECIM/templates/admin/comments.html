@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Yorum Yönetimi{% endblock %}
+{% block content %}
+<section class="admin-section">
+  <div class="container">
+    <div class="admin-header">
+      <h1>Yorumlar</h1>
+      <div class="admin-actions">
+        <span class="item-meta">Onay bekleyen: {{ pending_count }}</span>
+        <input id="commentFilter" class="admin-input" placeholder="Kullanıcı/İçerik ile filtrele" />
+      </div>
+    </div>
+    <div class="admin-table card">
+      <table class="table-modern" id="commentsTable">
+        <thead>
+          <tr>
+            <th>Kullanıcı</th>
+            <th>Yazı Başlığı</th>
+            <th>İçerik</th>
+            <th>Durum</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in comments.items %}
+          <tr>
+            <td>{{ c.author.name if c.author else '—' }}</td>
+            <td>{{ c.post.title if c.post else '—' }}</td>
+            <td class="max-w-xl">{{ c.content }}</td>
+            <td>{{ 'Onaylı' if c.is_approved else 'Beklemede' }}</td>
+            <td class="table-actions">
+              {% if not c.is_approved %}
+              <form method="post" action="{{ url_for('admin.approve_comment', comment_id=c.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-hero-modern">Onayla</button>
+              </form>
+              {% endif %}
+              <form method="post" action="{{ url_for('admin.delete_comment', comment_id=c.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-modern" onclick="return confirm('Silinsin mi?')">Sil</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="admin-pagination">
+        {% if comments.has_prev %}<a class="btn btn-outline-modern" href="{{ url_for('admin.comments', page=comments.prev_num, q=q) }}">Önceki</a>{% else %}<span></span>{% endif %}
+        {% if comments.has_next %}<a class="btn btn-hero-modern" href="{{ url_for('admin.comments', page=comments.next_num, q=q) }}">Sonraki</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

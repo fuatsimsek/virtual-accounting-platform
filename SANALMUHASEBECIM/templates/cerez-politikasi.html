@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h1 class="mb-0">
+                        <i class="fas fa-cookie-bite me-3"></i>
+                        Çerez (Cookie) Politikası
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75">Son güncelleme: Ocak 2025</p>
+                </div>
+                <div class="card-body p-5">
+                    <div class="cookie-content">
+                        <h2 class="text-primary mb-4">1. Çerez Nedir?</h2>
+                        <p class="mb-4">
+                            Çerezler (cookies), web sitemizi ziyaret ettiğinizde tarayıcınız aracılığıyla cihazınıza kaydedilen küçük metin dosyalarıdır. 
+                            Bu dosyalar, kullanıcı deneyimini iyileştirmek ve hizmetlerimizi geliştirmek amacıyla kullanılmaktadır.
+                        </p>
+
+                        <h2 class="text-primary mb-4">2. Çerez Türleri</h2>
+                        <div class="cookie-types">
+                            <div class="cookie-type-card mb-4">
+                                <div class="cookie-type-header">
+                                    <i class="fas fa-shield-alt text-success"></i>
+                                    <h4 class="mb-2">Zorunlu Çerezler</h4>
+                                </div>
+                                <p class="mb-2">Web sitesinin temel işlevlerini yerine getirmek için gerekli olan çerezlerdir.</p>
+                                <ul class="mb-0">
+                                    <li>Oturum yönetimi</li>
+                                    <li>Güvenlik kontrolleri</li>
+                                    <li>Form verilerinin korunması</li>
+                                </ul>
+                            </div>
+
+                            <div class="cookie-type-card mb-4">
+                                <div class="cookie-type-header">
+                                    <i class="fas fa-chart-line text-info"></i>
+                                    <h4 class="mb-2">Performans Çerezleri</h4>
+                                </div>
+                                <p class="mb-2">Web sitesinin performansını analiz etmek ve iyileştirmek için kullanılır.</p>
+                                <ul class="mb-0">
+                                    <li>Sayfa yükleme hızı analizi</li>
+                                    <li>Kullanıcı davranış analizi</li>
+                                    <li>Hata raporlama</li>
+                                </ul>
+                            </div>
+
+                            <div class="cookie-type-card mb-4">
+                                <div class="cookie-type-header">
+                                    <i class="fas fa-cog text-warning"></i>
+                                    <h4 class="mb-2">İşlevsellik Çerezleri</h4>
+                                </div>
+                                <p class="mb-2">Kullanıcı tercihlerini hatırlamak ve kişiselleştirilmiş deneyim sunmak için kullanılır.</p>
+                                <ul class="mb-0">
+                                    <li>Dil tercihi</li>
+                                    <li>Tema seçimi</li>
+                                    <li>Form verilerinin hatırlanması</li>
+                                </ul>
+                            </div>
+
+                            <div class="cookie-type-card mb-4">
+                                <div class="cookie-type-header">
+                                    <i class="fas fa-bullhorn text-danger"></i>
+                                    <h4 class="mb-2">Pazarlama Çerezleri</h4>
+                                </div>
+                                <p class="mb-2">Size ilgili reklamlar göstermek ve pazarlama kampanyalarını ölçmek için kullanılır.</p>
+                                <ul class="mb-0">
+                                    <li>Reklam performansı takibi</li>
+                                    <li>Hedefli reklamcılık</li>
+                                    <li>Sosyal medya entegrasyonu</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h2 class="text-primary mb-4">3. Kullandığımız Çerezler</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Çerez Adı</th>
+                                        <th>Tür</th>
+                                        <th>Amaç</th>
+                                        <th>Süre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>session_id</code></td>
+                                        <td><span class="badge bg-success">Zorunlu</span></td>
+                                        <td>Kullanıcı oturumu yönetimi</td>
+                                        <td>Oturum süresi</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>csrf_token</code></td>
+                                        <td><span class="badge bg-success">Zorunlu</span></td>
+                                        <td>Güvenlik koruması</td>
+                                        <td>Oturum süresi</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>language</code></td>
+                                        <td><span class="badge bg-warning">İşlevsellik</span></td>
+                                        <td>Dil tercihi</td>
+                                        <td>1 yıl</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>theme</code></td>
+                                        <td><span class="badge bg-warning">İşlevsellik</span></td>
+                                        <td>Tema tercihi</td>
+                                        <td>1 yıl</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>analytics_id</code></td>
+                                        <td><span class="badge bg-info">Performans</span></td>
+                                        <td>Site kullanım analizi</td>
+                                        <td>2 yıl</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h2 class="text-primary mb-4">4. Üçüncü Taraf Çerezler</h2>
+                        <p class="mb-4">
+                            Web sitemizde aşağıdaki üçüncü taraf hizmetler kullanılmaktadır:
+                        </p>
+                        <ul class="mb-4">
+                            <li><strong>Google Analytics:</strong> Site kullanım istatistikleri</li>
+                            <li><strong>Google Fonts:</strong> Web fontları</li>
+                            <li><strong>Font Awesome:</strong> İkon kütüphanesi</li>
+                            <li><strong>Bootstrap:</strong> CSS framework</li>
+                        </ul>
+
+                        <h2 class="text-primary mb-4">5. Çerez Yönetimi</h2>
+                        <div class="cookie-management">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="management-card">
+                                        <h5><i class="fas fa-browser text-primary"></i> Tarayıcı Ayarları</h5>
+                                        <p>Tarayıcınızın ayarlarından çerez tercihlerinizi yönetebilirsiniz:</p>
+                                        <ul>
+                                            <li>Chrome: Ayarlar > Gizlilik ve Güvenlik > Çerezler</li>
+                                            <li>Firefox: Ayarlar > Gizlilik ve Güvenlik > Çerezler</li>
+                                            <li>Safari: Tercihler > Gizlilik > Çerezler</li>
+                                            <li>Edge: Ayarlar > Çerezler ve site izinleri</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="management-card">
+                                        <h5><i class="fas fa-mobile-alt text-primary"></i> Mobil Cihazlar</h5>
+                                        <p>Mobil cihazlarda çerez ayarları:</p>
+                                        <ul>
+                                            <li>iOS Safari: Ayarlar > Safari > Gelişmiş > Web Sitesi Verileri</li>
+                                            <li>Android Chrome: Ayarlar > Site Ayarları > Çerezler</li>
+                                            <li>Samsung Internet: Ayarlar > Gizlilik ve Güvenlik</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 class="text-primary mb-4">6. Çerez Tercihlerinizi Değiştirme</h2>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Önemli:</strong> Bazı çerezleri devre dışı bırakmanız web sitesinin işlevselliğini etkileyebilir. 
+                            Zorunlu çerezler her zaman aktif kalmalıdır.
+                        </div>
+
+                        <h2 class="text-primary mb-4">7. Güncellemeler</h2>
+                        <p class="mb-4">
+                            Bu çerez politikası, web sitemizde yapılan değişiklikler veya yasal gereklilikler nedeniyle güncellenebilir. 
+                            Önemli değişiklikler olduğunda sizi bilgilendireceğiz.
+                        </p>
+
+                        <h2 class="text-primary mb-4">8. İletişim</h2>
+                        <p class="mb-4">
+                            Çerez politikamızla ilgili sorularınız için:
+                        </p>
+                        <div class="contact-info bg-light p-4 rounded">
+                            <p class="mb-2"><strong>E-posta:</strong> info@sanalmuhasebem.net</p>
+                            <p class="mb-2"><strong>Telefon:</strong> +90 xxx xxx xx xx</p>
+                            <p class="mb-0"><strong>Adres:</strong> [Şirket Adresi]</p>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <a href="{{ url_for('public.contact') }}" class="btn btn-primary me-3">
+                                <i class="fas fa-envelope me-2"></i>İletişime Geç
+                            </a>
+                            <a href="{{ url_for('public.privacy') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-shield-alt me-2"></i>Gizlilik Politikası
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.cookie-content h2 {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+
+.cookie-type-card {
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.cookie-type-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.cookie-type-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.cookie-type-header i {
+    font-size: 24px;
+}
+
+.cookie-type-header h4 {
+    margin: 0;
+    color: #495057;
+}
+
+.cookie-type-card ul {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.cookie-type-card li {
+    margin-bottom: 5px;
+    color: #6c757d;
+}
+
+.management-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    height: 100%;
+}
+
+.management-card h5 {
+    color: #495057;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.management-card ul {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.management-card li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.contact-info {
+    border-left: 4px solid var(--primary-color);
+}
+
+.table th {
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+code {
+    background: #f1f3f4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #d73a49;
+}
+</style>
+{% endblock %}

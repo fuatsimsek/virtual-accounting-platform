@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% block meta_description %}Sanal Muhasebecim ile iletişime geçin. Uzman muhasebe danışmanlığı için bize ulaşın. E-posta ve online form seçenekleri.{% endblock %}
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section hero-contact">
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    İletişime <span class="highlight">Geçin</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Muhasebe danışmanlığı için bizimle iletişime geçin. 
+                    Uzman ekibimiz size yardımcı olmaya hazır.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Content Section -->
+<section class="contact-content">
+    <div class="container">
+        <div class="contact-grid">
+            <!-- Contact Form -->
+            <div class="contact-form-section">
+                <div class="section-header">
+                    <h2 class="section-title">Mesaj Gönderin</h2>
+                    <p class="section-subtitle">Sorularınız için bize yazın</p>
+                </div>
+                
+                <form method="POST" class="contact-form">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        <label for="{{ form.name.id }}">Ad Soyad</label>
+                        {{ form.name(class="form-control", placeholder="Adınız ve soyadınız") }}
+                        {% if form.name.errors %}
+                            <div class="error-message">
+                                {% for error in form.name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.email.id }}">E-posta</label>
+                        {{ form.email(class="form-control", placeholder="ornek@email.com") }}
+                        {% if form.email.errors %}
+                            <div class="error-message">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.subject.id }}">Konu</label>
+                        {{ form.subject(class="form-control", placeholder="Mesajınızın konusu") }}
+                        {% if form.subject.errors %}
+                            <div class="error-message">
+                                {% for error in form.subject.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.message.id }}">Mesaj</label>
+                        {{ form.message(class="form-control", rows="5", placeholder="Mesajınızı buraya yazın...") }}
+                        {% if form.message.errors %}
+                            <div class="error-message">
+                                {% for error in form.message.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-large btn-full">
+                        <i class="fas fa-paper-plane"></i>
+                        Mesaj Gönder
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="contact-info-section">
+                <div class="section-header">
+                    <h2 class="section-title">İletişim Bilgileri</h2>
+                    <p class="section-subtitle">Bize ulaşmanın farklı yolları</p>
+                </div>
+                
+                <div class="contact-cards">
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>E-posta</h3>
+                            <p>info@sanalmuhasebecim.com</p>
+                            <small>24 saat içinde yanıt alın</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Adres</h3>
+                            <p>İstanbul, Türkiye</p>
+                            <small>Online hizmet veriyoruz</small>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Çalışma Saatleri</h3>
+                            <p>Pazartesi - Cuma</p>
+                            <small>09:00 - 18:00</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="social-links">
+                    <h3>Sosyal Medya</h3>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Sık Sorulan Sorular</h2>
+            <p class="section-subtitle">En çok merak edilen konular</p>
+        </div>
+        
+        <div class="faq-grid">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Hangi hizmetleri sunuyorsunuz?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Muhasebe danışmanlığı, vergi danışmanlığı, finansal analiz, büyüme stratejileri ve dijital muhasebe çözümleri sunuyoruz.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Online danışmanlık nasıl çalışıyor?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Video konferans ile uzaktan danışmanlık yapıyoruz. Randevu alın, görüşme linkini alın ve online olarak buluşalım.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Fiyatlandırma nasıl?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>İhtiyaçlarınıza göre özel fiyatlandırma yapıyoruz. İlk danışmanlık ücretsizdir.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Ne kadar sürede yanıt alırım?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>E-posta mesajlarınıza 24 saat içinde, acil durumlarda ise aynı gün içinde yanıt veriyoruz.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Hemen Başlayın</h2>
+            <p>Ücretsiz danışmanlık için hemen randevu alın.</p>
+            <a href="{{ url_for('booking.index') }}" class="btn btn-primary btn-large">
+                <i class="fas fa-calendar-check"></i>
+                Ücretsiz Ön Görüşme
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,705 @@
+{% extends "base.html" %}
+{% block title %}Ön Görüşme Planla{% endblock %}
+{% block meta_description %}Ücretsiz ön görüşme için randevu planlayın. Tarih, saat ve görüşme amacınızı belirtin.{% endblock %}
+{% block content %}
+
+<!-- Enhanced Hero Section -->
+<section class="hero-section hero-booking-form">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="floating-elements">
+        <div class="floating-icon" data-speed="1.5">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="floating-icon" data-speed="-1">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="floating-icon" data-speed="2">
+          <i class="fas fa-video"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <i class="fas fa-rocket"></i>
+          <span>Ücretsiz 10 Dakikalık Ön Görüşme</span>
+        </div>
+        <h1 class="hero-title">
+          Ön Görüşme <span class="gradient-text">Planla</span>
+        </h1>
+        <p class="hero-subtitle">
+          İhtiyaçlarınızı dinliyor, mevcut durumunuzu analiz ediyoruz.
+        </p>
+        <div class="hero-features">
+          <div class="feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Tamamen Ücretsiz</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>10 Dakika</span>
+          </div>
+          <div class="feature-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Online Görüşme</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Progress Indicator -->
+<section class="progress-section">
+  <div class="container">
+    <div class="progress-container">
+      <div class="progress-step {% if (ui_step or 1) >= 1 %}active{% endif %}">
+        <div class="step-number">1</div>
+        <div class="step-label">Bilgiler</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step {% if (ui_step or 1) >= 2 %}active{% endif %}">
+        <div class="step-number">2</div>
+        <div class="step-label">Onay</div>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step {% if (ui_step or 1) >= 3 %}active{% endif %}">
+        <div class="step-number">3</div>
+        <div class="step-label">Görüşme</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Form Section -->
+<section class="booking-form-section">
+  <div class="container">
+    <div class="form-container">
+      <div class="form-card">
+        {% if email_sent %}
+        <div class="alert alert-success" style="margin-bottom: 20px; padding: 20px; background: white; border: 2px solid #10b981; border-radius: 12px; color: #065f46; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fas fa-check-circle" style="font-size: 24px; color: #059669;"></i>
+            <div>
+              <strong style="font-size: 18px; color: #065f46;">Onay E-postası Gönderildi!</strong>
+              <p style="margin: 8px 0 0 0; font-size: 15px; color: #047857;">Lütfen e-postadaki bağlantıya tıklayarak randevunuzu onaylayın.</p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        <!-- Mevcut Randevu Durumu Bölümü -->
+        {% if confirmed_appointments %}
+        <div class="appointment-status-section" style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border: 1px solid #0ea5e9; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <i class="fas fa-calendar-check" style="color: #0ea5e9; font-size: 20px;"></i>
+            <h3 style="margin: 0; color: #0c4a6e; font-size: 18px; font-weight: 600;">Mevcut Onaylanmış Randevularınız</h3>
+          </div>
+          <div style="display: grid; gap: 12px;">
+            {% for appointment in confirmed_appointments %}
+            <div style="padding: 15px; background: white; border-radius: 8px; border: 1px solid #e0f2fe; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 40px; height: 40px; background: #0ea5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                    {{ appointment.appointment_datetime.strftime('%d') }}
+                  </div>
+                  <div>
+                    <div style="font-weight: 600; color: #0c4a6e; margin-bottom: 2px;">
+                      {% set aylar = {
+                        'January': 'Ocak',
+                        'February': 'Şubat',
+                        'March': 'Mart',
+                        'April': 'Nisan',
+                        'May': 'Mayıs',
+                        'June': 'Haziran',
+                        'July': 'Temmuz',
+                        'August': 'Ağustos',
+                        'September': 'Eylül',
+                        'October': 'Ekim',
+                        'November': 'Kasım',
+                        'December': 'Aralık'
+                      } %}
+                      {% set tarih = appointment.appointment_datetime.strftime('%d %B %Y') %}
+                      {% for eng, tr in aylar.items() %}
+                        {% set tarih = tarih.replace(eng, tr) %}
+                      {% endfor %}
+                      {{ tarih }}
+                    </div>
+                    <div style="color: #0369a1; font-size: 14px;">
+                      <i class="fas fa-clock"></i> {{ appointment.appointment_datetime.strftime('%H:%M') }}
+                    </div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="padding: 6px 12px; background: #10b981; color: white; border-radius: 20px; font-size: 12px; font-weight: 500;">
+                    <i class="fas fa-check-circle"></i> Onaylandı
+                  </span>
+                  <a href="{{ url_for('booking.my_appointments') }}" class="btn-soft text-sm" style="padding: 8px 16px; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-eye"></i> Detayları Gör
+                  </a>
+                </div>
+              </div>
+              {% if appointment.purpose %}
+              <div style="margin-top: 12px; padding: 10px; background: #f8fafc; border-radius: 6px; border-left: 3px solid #0ea5e9;">
+                <div style="font-size: 13px; color: #64748b; margin-bottom: 4px;"><strong>Görüşme Amacı:</strong></div>
+                <div style="font-size: 14px; color: #334155; white-space: pre-line;">{{ appointment.purpose }}</div>
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Service Info Section -->
+        <div class="service-info-section" style="margin-bottom: 30px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <i class="fas fa-briefcase" style="color: #0ea5e9; font-size: 18px;"></i>
+            <div>
+              <h4 style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 600;">Hizmetlerimiz</h4>
+              <p style="margin: 5px 0 0 0; color: #64748b; font-size: 14px;">Hizmetlerimizi inceleyebilir, detayları görebilirsiniz</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+            <a href="{{ url_for('public.services') }}" class="btn btn-primary" style="padding: 12px 20px; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+              <i class="fas fa-list"></i>
+              Hizmetleri Gör
+            </a>
+            <span style="color: #64748b; font-size: 13px; font-style: italic;">Hizmet seçimi zorunlu değildir, genel danışmanlık için randevu alabilirsiniz.</span>
+          </div>
+          
+          <!-- Hizmet Seçimi Formu -->
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
+            <p style="margin: 0 0 10px 0; color: #475569; font-size: 14px; font-weight: 500;">
+              <i class="fas fa-arrow-down" style="margin-right: 5px; color: #0ea5e9;"></i>
+              Veya belirli bir hizmet için randevu almak istiyorsanız:
+            </p>
+                         <form method="get" action="{{ url_for('booking.new_appointment') }}" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+               <select name="service_id" style="padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; min-width: 250px; font-size: 14px; background: white; flex: 1;">
+                 <option value="">Hizmet seçiniz (opsiyonel)...</option>
+                 {% for s in services or [] %}
+                 <option value="{{ s.id }}" {% if request.args.get('service_id')|int == s.id %}selected{% endif %}>{{ s.name }}</option>
+                 {% endfor %}
+               </select>
+               <button class="btn btn-sm btn-outline-primary" type="submit" style="padding: 10px 16px; font-size: 14px; white-space: nowrap;">
+                 <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                 Devam Et
+               </button>
+             </form>
+          </div>
+        </div>
+
+        <div class="form-header">
+          <div class="form-icon">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <h2>Randevu Bilgileri</h2>
+          <p>Lütfen aşağıdaki bilgileri doldurun</p>
+        </div>
+        
+        {% if service_request %}
+        <div class="service-request-info">
+          <div class="info-card">
+            <div class="info-header">
+              <i class="fas fa-clipboard-list"></i>
+              <h4>Hizmet Talebi</h4>
+            </div>
+            <div class="info-content">
+              <div class="info-item">
+                <strong>Hizmet:</strong> {{ service_request.service.name }}
+              </div>
+              <div class="info-item">
+                <strong>Talep Tarihi:</strong> {{ service_request.created_at.strftime('%d.%m.%Y %H:%M') }}
+              </div>
+              {% if service_request.additional_details %}
+              <div class="info-item">
+                <strong>Ekstra Detaylar:</strong>
+                <div class="details-text">{{ service_request.additional_details }}</div>
+              </div>
+              {% endif %}
+            </div>
+            <div class="info-actions" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="{{ url_for('booking.new_appointment', reset=1) }}" class="btn btn-sm btn-outline-danger"><i class="fas fa-times"></i> Hizmeti Temizle</a>
+              <a href="{{ url_for('public.services') }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-list"></i> Hizmetleri Gör</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if not service_request and selected_service %}
+        <div class="service-request-info">
+          <div class="info-card">
+            <div class="info-header">
+              <i class="fas fa-clipboard-list"></i>
+              <h4>Seçilen Hizmet</h4>
+            </div>
+            <div class="info-content">
+              <div class="info-item">
+                <strong>Hizmet:</strong> {{ selected_service.name }}
+              </div>
+            </div>
+            <div class="info-actions" style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="{{ url_for('booking.new_appointment', reset=1) }}" class="btn btn-sm btn-outline-danger"><i class="fas fa-times"></i> Hizmeti Kaldır</a>
+              <a href="{{ url_for('public.services') }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-list"></i> Hizmetleri Gör</a>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <form method="post" class="booking-form" id="bookingForm">
+          {{ form.hidden_tag() }}
+          {% if request.args.get('service_id') and not service_request %}
+          <input type="hidden" name="service_id" value="{{ request.args.get('service_id') }}">
+          {% endif %}
+          
+          <div class="form-section" {% if (ui_step or 1) >= 2 %}style="pointer-events:none;opacity:.6"{% endif %}>
+            <div class="section-title">
+              <i class="fas fa-user"></i>
+              <span>İletişim Bilgileri</span>
+            </div>
+            
+            <div class="form-group enhanced">
+              <label class="form-label">
+                <i class="fas fa-envelope"></i>
+                <span>E-posta Adresi</span>
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                {{ form.email(class_='form-control enhanced', placeholder='ornek@email.com') }}
+                <div class="input-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+              </div>
+              {% if form.email.errors %}
+                <div class="error-message">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.email.errors[0] }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="form-section" {% if (ui_step or 1) >= 2 %}style="pointer-events:none;opacity:.6"{% endif %}>
+            <div class="section-title">
+              <i class="fas fa-calendar"></i>
+              <span>Görüşme Detayları</span>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group enhanced">
+                <label class="form-label">
+                  <i class="fas fa-calendar-day"></i>
+                  <span>Görüşme Tarihi</span>
+                  <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  {{ form.appointment_date(class_='form-control enhanced', type='date') }}
+                  <div class="input-icon">
+                    <i class="fas fa-calendar-day"></i>
+                  </div>
+                </div>
+                {% if form.appointment_date.errors %}
+                  <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.appointment_date.errors[0] }}
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="form-group enhanced">
+                <label class="form-label">
+                  <i class="fas fa-clock"></i>
+                  <span>Görüşme Saati</span>
+                  <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  {{ form.appointment_time(class_='form-control enhanced', type='time') }}
+                  <div class="input-icon">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                </div>
+                {% if form.appointment_time.errors %}
+                  <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.appointment_time.errors[0] }}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="form-group enhanced">
+                <label class="form-label">
+                  <i class="fas fa-video"></i>
+                  <span>Platform</span>
+                  <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  {{ form.platform(class_='form-control enhanced') }}
+                  <div class="input-icon">
+                    <i class="fas fa-video"></i>
+                  </div>
+                </div>
+                {% if form.platform.errors %}
+                  <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ form.platform.errors[0] }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-section" {% if (ui_step or 1) >= 2 %}style="pointer-events:none;opacity:.6"{% endif %}>
+            <div class="section-title">
+              <i class="fas fa-comments"></i>
+              <span>Görüşme Amacı</span>
+            </div>
+            
+            <div class="form-group enhanced">
+              <label class="form-label">
+                <i class="fas fa-lightbulb"></i>
+                <span>Hangi konuda yardıma ihtiyacınız var?</span>
+                <span class="required">*</span>
+              </label>
+              <div class="input-wrapper">
+                {{ form.purpose(class_='form-control enhanced textarea', rows=5, placeholder='İşletmenizin mevcut durumu, hedefleriniz ve beklentilerinizi kısaca açıklayın. Örneğin: Yeni şirket kurulumu, vergi danışmanlığı, muhasebe süreçleri, finansal analiz vb.') }}
+                <div class="input-icon textarea-icon">
+                  <i class="fas fa-lightbulb"></i>
+                </div>
+              </div>
+              {% if form.purpose.errors %}
+                <div class="error-message">
+                  <i class="fas fa-exclamation-circle"></i>
+                  {{ form.purpose.errors[0] }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          {% if form.errors %}
+            <div class="form-errors">
+              <div class="error-card">
+                <div class="error-header">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <span>Form Hataları</span>
+                </div>
+                <div class="error-list">
+                  {% for field, errors in form.errors.items() %}
+                    {% for error in errors %}
+                      <div class="error-item">
+                        <i class="fas fa-times-circle"></i>
+                        <span>{{ error }}</span>
+                      </div>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+          
+          <div class="form-actions">
+            <button class="btn btn-primary btn-hero-modern" type="submit" id="submitBtn" {% if (ui_step or 1) >= 2 %}disabled{% endif %}>
+              <i class="fas fa-calendar-check"></i>
+              <span>Ön Görüşme Planla</span>
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <div class="form-note">
+              <i class="fas fa-info-circle"></i>
+              {% if (ui_step or 1) == 1 %}
+                {% if email_sent %}
+                  <span>Onay e-postası gönderildi. Lütfen e-postadaki bağlantı ile onaylayın.</span>
+                {% else %}
+                  <span>Randevu onayınız e-postanıza gönderilecektir.</span>
+                {% endif %}
+              {% elif (ui_step or 1) == 2 %}
+                  <span>E-posta onayınız alındı. Yetkili onayı bekleniyor; onaylandığında link e-postanıza gelecek ve 3. adım aktifleşecek.</span>
+              {% else %}
+                <span>Randevunuz onaylandı. Görüşme bilgileri aşağıda.</span>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <div class="form-sidebar">
+        <div class="sidebar-card">
+          <div class="card-header">
+            <i class="fas fa-info-circle"></i>
+            <h3>Bilgilendirme</h3>
+          </div>
+          <div class="card-content">
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <div>
+                <strong>10 Dakika</strong>
+                <span>Ön görüşme tamamen ücretsiz</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-video"></i>
+              <div>
+                <strong>Online Görüşme</strong>
+                <span>Zoom veya Teams</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-file-contract"></i>
+              <div>
+                <strong>Detaylı Teklif</strong>
+                <span>Görüşme sonrası</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-shield-alt"></i>
+              <div>
+                <strong>Güvenli</strong>
+                <span>Verileriniz korunur</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sidebar-card">
+          <div class="card-header">
+            <i class="fas fa-question-circle"></i>
+            <h3>Sık Sorulan Sorular</h3>
+          </div>
+          <div class="card-content">
+            <div class="faq-item">
+              <h4>Ön görüşme ücretli mi?</h4>
+              <p>Hayır, ön görüşmelerimiz tamamen ücretsizdir.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Hangi platformları kullanıyoruz?</h4>
+              <p>Zoom, Microsoft Teams veya Google Meet.</p>
+            </div>
+            <div class="faq-item">
+              <h4>Ne kadar sürer?</h4>
+              <p>Genellikle 10 dakika sürer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Success Preview Section -->
+<section class="success-preview">
+  <div class="container">
+    <div class="preview-content">
+      <div class="preview-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      {% if (ui_step or 1) == 1 %}
+        {% if email_sent %}
+          <h2>Onay E-postası Gönderildi</h2>
+          <p>E-postadaki bağlantıya tıklayarak randevunuzu onaylayın.</p>
+        {% else %}
+          <h2>Bilgilerinizi Girin</h2>
+          <p>Formu doldurduktan sonra onay bağlantısı e-posta adresinize gönderilecek.</p>
+        {% endif %}
+      {% elif (ui_step or 1) == 2 %}
+        <h2>Randevunuz Alındı!</h2>
+        <p>E-posta onayınız alındı. Randevunuz en kısa sürede değerlendirilecek; onaylandığında e‑postanıza görüşme linki gönderilecek ve bu sayfada 3. adım aktifleşecek.</p>
+      {% else %}
+        <h2>Randevunuz Alındı!</h2>
+        <p>Görüşme linki ve detaylar e‑postanıza gönderildi.</p>
+      {% endif %}
+      <div class="preview-steps">
+        <div class="step step-1">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>E-posta Onayı</h4>
+            {% if (ui_step or 1) == 1 %}
+              {% if email_sent %}
+                <p style="color: #059669; font-weight: 500;"><i class="fas fa-check-circle"></i> Onay e-postası gönderildi</p>
+              {% else %}
+                <p>Form doldurulduktan sonra e-posta onayı gönderilecek</p>
+              {% endif %}
+            {% elif (ui_step or 1) >= 2 %}
+              <p style="color: #059669; font-weight: 500;">
+                <i class="fas fa-check-circle"></i> E-posta onayınız alındı!
+              </p>
+            {% else %}
+              <p>Onay bağlantısı e‑posta adresinize gönderildi.</p>
+            {% endif %}
+          </div>
+        </div>
+        <div class="step step-2">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Görüşme Linki</h4>
+            {% if last_appointment %}
+              {% set status_tr = {'pending':'Beklemede','awaiting_payment':'Ödeme Bekleniyor','paid':'Ödendi','confirmed':'Onaylandı','completed':'Tamamlandı','cancelled':'İptal Edildi','email_confirmed':'E-posta Onaylandı'} %}
+              <p>
+                Platform: <b>{{ last_appointment.platform or '-' }}</b><br/>
+                Tarih: <b>{{ last_appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M') }}</b><br/>
+                Durum: <b>{{ status_tr.get(last_appointment.status, last_appointment.status) }}</b>
+              </p>
+            {% elif (ui_step or 1) >= 2 %}
+              <p style="color: #0ea5e9; font-weight: 500;">
+                <i class="fas fa-clock"></i> Yetkili onayı bekleniyor...
+              </p>
+            {% else %}
+              <p>Görüşme öncesi Zoom/Teams/Meet linki paylaşılacak</p>
+            {% endif %}
+            {% if last_appointment %}
+            <div style="margin-top:8px;">
+              <div style="height:6px;background:#e5e7eb;border-radius:9999px;overflow:hidden;">
+                {% if (ui_step or 1) == 2 %}
+                  <div style="width: 50%; height:100%; background: linear-gradient(90deg,#60a5fa,#34d399);"></div>
+                {% elif (ui_step or 1) >= 3 %}
+                  <div style="width: 100%; height:100%; background: linear-gradient(90deg,#60a5fa,#34d399);"></div>
+                {% else %}
+                  <div style="width: 25%; height:100%; background: linear-gradient(90deg,#60a5fa,#34d399);"></div>
+                {% endif %}
+              </div>
+              <small style="color:#64748b">
+                {% if last_appointment.status == 'confirmed' %}
+                  Durum: E-posta Onaylandı
+                {% elif last_appointment.meeting_link %}
+                  Durum: Görüşme Hazır
+                {% else %}
+                  Durum: {{ status_tr.get(last_appointment.status, last_appointment.status) }}
+                {% endif %}
+              </small>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="step step-3">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Profesyonel Destek</h4>
+            {% if last_appointment and last_appointment.meeting_link %}
+              {%- set pf = (last_appointment.platform or '') -%}
+              {%- set pf_label = 'Toplantı' -%}
+              {%- if pf == 'meet' -%}{% set pf_label = 'Google Meet' %}{%- elif pf == 'zoom' -%}{% set pf_label = 'Zoom' %}{%- elif pf == 'teams' -%}{% set pf_label = 'Microsoft Teams' %}{%- endif -%}
+              <div class="sidebar-card meeting-card">
+                <div class="card-header">
+                  <i class="fas fa-video"></i>
+                  <h3>{{ pf_label }} ile Görüşme</h3>
+                </div>
+                <div class="card-content">
+                  <div class="meeting-info-grid">
+                    <div class="meeting-info-item">
+                      <i class="fas fa-calendar-alt"></i>
+                      <div class="info-content">
+                        <strong>Tarih / Saat</strong>
+                        <span>{{ last_appointment.appointment_datetime.strftime('%d.%m.%Y %H:%M') }}</span>
+                      </div>
+                    </div>
+                    <div class="meeting-info-item">
+                      <i class="fas fa-link"></i>
+                      <div class="info-content">
+                        <strong>Bağlantı</strong>
+                        <span>{{ pf_label }}</span>
+                      </div>
+                    </div>
+                    <div class="meeting-actions">
+                      <a href="{{ last_appointment.meeting_link }}" target="_blank" class="btn btn-modern btn-primary-modern">
+                        <i class="fas fa-external-link-alt"></i>
+                        Toplantıya Katıl
+                      </a>
+                      <button type="button" class="btn btn-modern btn-outline-modern copy-link-btn" data-link="{{ last_appointment.meeting_link }}">
+                        <i class="fas fa-copy"></i>
+                        Bağlantıyı Kopyala
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                         {% else %}
+               <p style="color:#475569">E-posta onayınızı yaptıktan sonra uzman ekibimiz randevunuzu onaylayacak ve buraya görüşme bilgileri gelecek.</p>
+             {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Copy Link Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const copyLinkBtn = document.querySelector('.copy-link-btn');
+  
+  if (copyLinkBtn) {
+    copyLinkBtn.addEventListener('click', function() {
+      const link = this.getAttribute('data-link');
+      
+      if (link) {
+        // Use modern clipboard API if available
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(link).then(function() {
+            showCopySuccess(copyLinkBtn);
+          }).catch(function(err) {
+            console.error('Clipboard write failed:', err);
+            fallbackCopyTextToClipboard(link, copyLinkBtn);
+          });
+        } else {
+          // Fallback for older browsers
+          fallbackCopyTextToClipboard(link, copyLinkBtn);
+        }
+      } else {
+        console.error('No link found in data-link attribute');
+      }
+    });
+  }
+});
+
+// Fallback copy function for older browsers
+function fallbackCopyTextToClipboard(text, button) {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  textArea.style.position = 'fixed';
+  textArea.style.left = '-999999px';
+  textArea.style.top = '-999999px';
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      showCopySuccess(button);
+    } else {
+      console.error('Fallback copy failed');
+    }
+  } catch (err) {
+    console.error('Fallback copy failed:', err);
+  }
+  
+  document.body.removeChild(textArea);
+}
+
+// Show success feedback
+function showCopySuccess(button) {
+  const originalText = button.innerHTML;
+  const originalClass = button.className;
+  
+  // Change button appearance
+  button.innerHTML = '<i class="fas fa-check"></i> Kopyalandı!';
+  button.className = button.className.replace('btn-outline-modern', 'btn-success');
+  button.style.background = '#10b981';
+  button.style.color = 'white';
+  button.style.borderColor = '#10b981';
+  
+  // Reset button after 2 seconds
+  setTimeout(function() {
+    button.innerHTML = originalText;
+    button.className = originalClass;
+    button.style.background = '';
+    button.style.color = '';
+    button.style.borderColor = '';
+  }, 2000);
+}
+</script>
+
+{% endblock %}
+

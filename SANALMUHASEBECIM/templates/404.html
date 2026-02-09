@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Sayfa Bulunamadı{% endblock %}
+{% block content %}
+<div class="container" style="max-width:720px;padding:40px 16px;">
+    <div style="text-align:center;background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:16px;padding:32px;border:1px solid #e9ecef;">
+        <div style="font-size:64px;line-height:1;">🧭</div>
+        <h1 style="margin:12px 0 4px;font-weight:800;color:#0d6efd;">Aradığınız sayfa bulunamadı</h1>
+        <p style="margin:0 0 16px;color:#6c757d;">Bağlantı hatalı olabilir veya sayfa kaldırılmış olabilir.</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <a href="{{ url_for('public.index') }}" class="btn btn-primary">Ana sayfaya dön</a>
+            <a href="{{ url_for('public.contact') }}" class="btn btn-outline-primary">İletişime geç</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+{% block title %}Yeni Gönderi{% endblock %}
+{% block meta_description %}Yeni blog gönderisi oluşturun. Başlık, alt başlık ve içerik ile paylaşın.{% endblock %}
+
+{% block head %}
+<!-- TinyMCE (self-hosted local) -->
+<script src="{{ url_for('static', filename='tinymce-main/tinymce.min.js') }}"></script>
+<style>
+.blog-editor-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.blog-editor-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.blog-editor-body {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-control.title-input {
+  font-size: 24px;
+  font-weight: 700;
+  padding: 16px 20px;
+}
+
+.form-control.subtitle-input {
+  font-size: 18px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.tinymce-container {
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Remove CKEditor-specific styles (switched to TinyMCE) */
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 12px 24px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 12px;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.preview-btn {
+  background: #10b981;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.word-count {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .blog-editor-body {
+    padding: 20px;
+  }
+  
+  .editor-actions {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .btn-secondary {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-section hero-services">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Yeni <span class="highlight">Gönderi</span></h1>
+        <p class="hero-subtitle">Zengin editör ile profesyonel blog yazıları oluşturun</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services-grid-section">
+  <div class="container">
+    <div class="blog-editor-container">
+      <div class="blog-editor-header">
+        <h2><i class="fas fa-edit"></i> Blog Editörü</h2>
+        <p>Başlık, alt başlık ve zengin içerik ile etkileyici blog yazıları oluşturun</p>
+      </div>
+      
+      <div class="blog-editor-body">
+        <form method="post" action="{{ url_for('blog.new_post') }}" class="space-y-4" id="blogForm">
+          {{ form.hidden_tag() }}
+          {% if form.errors %}
+          <div class="alert alert-danger" style="margin-bottom:16px;">
+            Lütfen aşağıdaki alanları kontrol edin.
+          </div>
+          {% endif %}
+          
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-heading"></i> Başlık
+            </label>
+            {{ form.title(class_='form-control title-input', placeholder='Blog yazınızın ana başlığını yazın...') }}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-subscript"></i> Alt Başlık
+            </label>
+            {{ form.subtitle(class_='form-control subtitle-input', placeholder='Blog yazınızın alt başlığını yazın (opsiyonel)...') }}
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-pen-fancy"></i> İçerik
+            </label>
+            <div class="tinymce-container">
+              {{ form.post_text(class_='tinymce-editor', id='postContent') }}
+              {% if form.post_text.errors %}
+              <div class="text-danger" style="margin-top:8px;">{{ form.post_text.errors[0] }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="editor-actions">
+            <div class="left-actions">
+              <button type="button" class="btn-secondary" onclick="saveDraft()">
+                <i class="fas fa-save"></i> Taslak Kaydet
+              </button>
+              <button type="button" class="btn-secondary" onclick="openDraftModal()">
+                <i class="fas fa-upload"></i> Taslak Yükle
+              </button>
+              <button type="button" class="preview-btn" onclick="previewPost()">
+                <i class="fas fa-eye"></i> Önizleme
+              </button>
+            </div>
+            
+            <div class="right-actions">
+              <span class="word-count" id="wordCount">0 kelime</span>
+              <button class="btn btn-primary" id="publishBtn" type="submit">
+                <i class="fas fa-paper-plane"></i> Yayınla
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Preview Modal -->
+<div id="previewModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Önizleme</h3>
+      <span class="close" onclick="closePreview()">&times;</span>
+    </div>
+    <div class="modal-body" id="previewContent">
+    </div>
+  </div>
+</div>
+
+<!-- Draft Restore Modal -->
+<div id="draftModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Taslak bulundu</h3>
+      <span class="close" onclick="closeDraftModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p>Son 24 saat içinde kaydedilmiş bir taslağınız var. Yüklemek ister misiniz?</p>
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn-secondary" onclick="restoreDraft()"><i class="fas fa-upload"></i> Yükle</button>
+        <button class="btn btn-primary" onclick="discardDraft()"><i class="fas fa-trash"></i> Sil</button>
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<script>
+// TinyMCE Configuration (self-hosted)
+tinymce.init({
+  selector: '#postContent',
+  height: 500,
+  base_url: '{{ url_for('static', filename='tinymce-main') }}',
+  suffix: '.min',
+  license_key: 'gpl',
+  plugins: [
+    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+  ],
+  toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+           'alignleft aligncenter alignright alignjustify | ' +
+           'bullist numlist outdent indent | link image media table | ' +
+           'forecolor backcolor | removeformat | code fullscreen',
+  menubar: 'file edit view insert format tools table help',
+  image_caption: true,
+  automatic_uploads: false,
+  file_picker_types: 'image',
+  init_instance_callback: function(ed) {
+    // Editor hazır; otomatik taslak yükleme yapmıyoruz (modal üzerinden kullanıcı karar verecek)
+  },
+  file_picker_callback: function(callback, value, meta) {
+    if (meta.filetype === 'image') {
+      var input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
+
+      input.onchange = function() {
+        var file = this.files[0];
+        var reader = new FileReader();
+        reader.onload = function() {
+          callback(reader.result, { alt: file.name });
+        };
+        reader.readAsDataURL(file);
+      };
+
+      input.click();
+    }
+  },
+  setup: function(editor) {
+    editor.on('keyup change', function() {
+      updateWordCount();
+    });
+    setInterval(function() { autoSaveDraft(); }, 30000);
+  }
+});
+
+// Ensure TinyMCE pushes content back to textarea before submit
+document.getElementById('blogForm').addEventListener('submit', function() {
+  if (tinymce && tinymce.triggerSave) {
+    tinymce.triggerSave();
+  }
+});
+
+// Safety: ensure publish button definitely submits
+document.getElementById('publishBtn').addEventListener('click', function(e){
+  try { if (tinymce && tinymce.triggerSave) tinymce.triggerSave(); } catch (err) {}
+  // No preventDefault here; allow native submit
+});
+
+function loadDraftIntoEditor() {
+  var draft = localStorage.getItem('blogDraft');
+  if (!draft) return;
+  var draftData = JSON.parse(draft);
+  var draftDate = new Date(draftData.timestamp);
+  var now = new Date();
+  var diffHours = (now - draftDate) / (1000 * 60 * 60);
+  if (diffHours >= 24) return;
+  document.querySelector('.title-input').value = draftData.title || '';
+  document.querySelector('.subtitle-input').value = draftData.subtitle || '';
+  var ed = tinymce.get('postContent');
+  if (ed) {
+    ed.setContent(draftData.content || '');
+    updateWordCount();
+  } else {
+    // Editor henüz hazır değilse kısa bir gecikmeden sonra tekrar dene
+    setTimeout(loadDraftIntoEditor, 200);
+  }
+}
+
+function closeDraftModal(){
+  var modal = document.getElementById('draftModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function restoreDraft(){
+  try {
+    var raw = localStorage.getItem('blogDraft');
+    if (!raw) return closeDraftModal();
+    var d = JSON.parse(raw);
+    document.querySelector('.title-input').value = d.title || '';
+    document.querySelector('.subtitle-input').value = d.subtitle || '';
+    var ed = tinymce.get('postContent');
+    if (ed) ed.setContent(d.content || '');
+    updateWordCount();
+  } catch (e) {}
+  closeDraftModal();
+}
+
+function discardDraft(){
+  try { localStorage.removeItem('blogDraft'); } catch (e) {}
+  closeDraftModal();
+}
+
+function openDraftModal(){
+  try {
+    var raw = localStorage.getItem('blogDraft');
+    if (!raw) { showNotification('Yüklenecek taslak bulunamadı.', 'error'); return; }
+    var data = JSON.parse(raw);
+    var ageH = (new Date() - new Date(data.timestamp)) / (1000*60*60);
+    if (ageH >= 24) { showNotification('Taslak 24 saati geçmiş.', 'error'); return; }
+    var modal = document.getElementById('draftModal');
+    if (modal) modal.style.display = 'block';
+  } catch (e) {
+    showNotification('Taslak kontrolünde hata.', 'error');
+  }
+}
+
+// Word count function
+function updateWordCount() {
+  var content = tinymce.get('postContent') ? tinymce.get('postContent').getContent({ format: 'text' }) : '';
+  var wordCount = content.trim().split(/\s+/).filter(function(w){ return w.length > 0; }).length;
+  document.getElementById('wordCount').textContent = wordCount + ' kelime';
+}
+
+// Auto save draft
+function autoSaveDraft() {
+  var title = document.querySelector('.title-input').value;
+  var subtitle = document.querySelector('.subtitle-input').value;
+  var content = tinymce.get('postContent') ? tinymce.get('postContent').getContent() : '';
+  if (title || content) {
+    localStorage.setItem('blogDraft', JSON.stringify({
+      title: title,
+      subtitle: subtitle,
+      content: content,
+      timestamp: new Date().toISOString()
+    }));
+  }
+}
+
+// Save draft manually
+function saveDraft() {
+  autoSaveDraft();
+  showNotification('Taslak kaydedildi!', 'success');
+}
+
+// Preview post
+function previewPost() {
+  var title = document.querySelector('.title-input').value;
+  var subtitle = document.querySelector('.subtitle-input').value;
+  var content = tinymce.get('postContent') ? tinymce.get('postContent').getContent() : '';
+  
+  var previewHtml = `
+    <div class="blog-preview">
+      <h1>${title || 'Başlık Yok'}</h1>
+      ${subtitle ? `<h2>${subtitle}</h2>` : ''}
+      <div class="content">${content || '<p>İçerik yok</p>'}</div>
+    </div>
+  `;
+  
+  document.getElementById('previewContent').innerHTML = previewHtml;
+  document.getElementById('previewModal').style.display = 'block';
+}
+
+// Close preview
+function closePreview() {
+  document.getElementById('previewModal').style.display = 'none';
+}
+
+// Show notification
+function showNotification(message, type) {
+  var notification = document.createElement('div');
+  notification.className = 'notification ' + type;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+  `;
+  
+  if (type === 'success') {
+    notification.style.background = '#10b981';
+  } else {
+    notification.style.background = '#ef4444';
+  }
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(function() {
+    notification.remove();
+  }, 3000);
+}
+
+// Draft restore prompt (modal) - shown once per session
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    var alreadyShown = sessionStorage.getItem('draftPromptShown') === 'true';
+    var raw = localStorage.getItem('blogDraft');
+    if (alreadyShown || !raw) return;
+    var data = JSON.parse(raw);
+    var ageH = (new Date() - new Date(data.timestamp)) / (1000*60*60);
+    if (ageH >= 24) return;
+    var modal = document.getElementById('draftModal');
+    if (modal) {
+      modal.style.display = 'block';
+      sessionStorage.setItem('draftPromptShown', 'true');
+    }
+  } catch (e) {}
+});
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  var modal = document.getElementById('previewModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+</script>
+
+<style>
+/* Modal Styles */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  opacity: 0.7;
+}
+
+.modal-body {
+  padding: 30px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.blog-preview h1 {
+  color: #2d3748;
+  font-size: 2.5em;
+  margin-bottom: 16px;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 16px;
+}
+
+.blog-preview h2 {
+  color: #4a5568;
+  font-size: 1.5em;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.blog-preview .content {
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+</style>
+{% endblock %}

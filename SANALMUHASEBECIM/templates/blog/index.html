@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Blog - Sanal Muhasebecim{% endblock %}
+{% block meta_description %}Muhasebe, vergi ve iş dünyası hakkında güncel bilgiler, ipuçları ve uzman görüşleri.{% endblock %}
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section hero-services">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Blog & <span class="highlight">İçerik</span></h1>
+        <p class="hero-subtitle">Muhasebe dünyasından güncel bilgiler, ipuçları ve uzman görüşleri</p>
+        <div class="hero-actions">
+          {% if current_user.is_authenticated and current_user.is_admin %}
+          <a class="btn btn-primary btn-hero" href="{{ url_for('blog.new_post') }}">
+            <i class="fas fa-plus"></i>
+            Yeni Gönderi
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Blog Posts Section -->
+<section class="services-grid-section">
+  <div class="container">
+    {% if posts.items %}
+    <div class="blog-grid">
+      {% for post in posts.items %}
+      <article class="blog-card">
+        <div class="blog-card-header">
+          <div class="blog-category">
+            <span class="badge">Blog</span>
+          </div>
+          <div class="blog-date">
+            <i class="fas fa-calendar"></i>
+            {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+            {{ '%02d'|format((post.published_at or post.post_date).day) }} {{ tr_months[(post.published_at or post.post_date).month] }} {{ (post.published_at or post.post_date).year }}
+          </div>
+        </div>
+        
+        <div class="blog-card-content">
+          <h3 class="blog-title">
+            <a href="{{ url_for('blog.post_detail', slug=post.slug or post.id) }}">
+              {{ post.title }}
+            </a>
+          </h3>
+          
+          {% if post.subtitle %}
+          <p class="blog-subtitle">{{ post.subtitle }}</p>
+          {% endif %}
+          
+          {% if post.excerpt %}
+          <p class="blog-excerpt">{{ post.excerpt }}</p>
+          {% endif %}
+        </div>
+        
+        <div class="blog-card-footer">
+          <div class="blog-author">
+            <span class="author-avatar" style="width:32px;height:32px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:#eef2ff;margin-right:8px;">
+              {% if post.author and post.author.profile_photo %}
+              <img src="{{ post.author.profile_photo }}" alt="{{ post.author.name }}" style="width:100%;height:100%;object-fit:cover;display:block;" />
+              {% else %}
+              <i class="fas fa-user" style="color:#6366f1;"></i>
+              {% endif %}
+            </span>
+            {{ post.author.name }}
+          </div>
+          <div class="blog-stats">
+            <span class="blog-comments">
+              <i class="fas fa-comments"></i>
+              {{ post.comments|length }}
+            </span>
+            <span class="blog-likes">
+              <i class="fas fa-heart"></i>
+              {{ post.likes|length }}
+            </span>
+          </div>
+        </div>
+        
+        <a href="{{ url_for('blog.post_detail', slug=post.slug or post.id) }}" class="blog-card-link">
+          <i class="fas fa-arrow-right"></i>
+          Devamını Oku
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if posts.pages > 1 %}
+    <div class="pagination-wrapper">
+      <nav class="pagination">
+        {% if posts.has_prev %}
+        <a href="{{ url_for('blog.index', page=posts.prev_num) }}" class="pagination-item">
+          <i class="fas fa-chevron-left"></i>
+          Önceki
+        </a>
+        {% endif %}
+        
+        <div class="pagination-info">
+          Sayfa {{ posts.page }} / {{ posts.pages }}
+        </div>
+        
+        {% if posts.has_next %}
+        <a href="{{ url_for('blog.index', page=posts.next_num) }}" class="pagination-item">
+          Sonraki
+          <i class="fas fa-chevron-right"></i>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-newspaper"></i>
+      </div>
+      <h3>Henüz Blog Gönderisi Yok</h3>
+      <p>Yakında burada değerli içerikler paylaşacağız.</p>
+      {% if current_user.is_authenticated and current_user.is_admin %}
+      <a href="{{ url_for('blog.new_post') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i>
+        İlk Gönderiyi Oluştur
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

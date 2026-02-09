@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Gönderi Yönetimi{% endblock %}
+{% block content %}
+<section class="admin-section">
+  <div class="container">
+    <div class="admin-header">
+      <h1>Gönderiler</h1>
+      <div class="admin-actions">
+        <form method="get" action="{{ url_for('admin.posts') }}" class="flex gap-2">
+          <input name="q" value="{{ q or '' }}" class="admin-input" placeholder="Başlık / Alt başlık / Yazar" />
+          <button class="btn btn-hero-modern" type="submit">Ara</button>
+        </form>
+        <a class="btn btn-hero-modern" href="{{ url_for('blog.new_post') }}">Yeni Gönderi</a>
+      </div>
+    </div>
+    <div class="admin-table card">
+      <table class="table-modern" id="postsTable">
+        <thead><tr><th>Başlık</th><th>Alt Başlık</th><th>Yazar</th><th>Durum</th><th>Öne Çıkar</th><th>Tarih</th><th>İşlem</th></tr></thead>
+        <tbody>
+          {% for p in posts.items %}
+          <tr>
+            <td>{{ p.title }}</td>
+            <td>{{ p.subtitle or '—' }}</td>
+            <td>{{ p.author.name if p.author else '—' }}</td>
+            <td>{{ 'Aktif' if p.is_active else 'Pasif' }}</td>
+            <td>
+              <form method="post" action="{{ url_for('admin.feature_post', post_id=p.id) }}" class="flex items-center gap-2">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="checkbox" name="is_featured" value="1" onchange="this.form.submit()" {% if p.is_featured %}checked{% endif %}>
+              </form>
+            </td>
+            <td>{{ p.post_date.strftime('%d.%m.%Y') }}</td>
+            <td class="table-actions">
+              <a class="btn btn-sm btn-outline-modern" href="{{ url_for('blog.edit_post', post_id=p.id) }}">Düzenle</a>
+              <form method="post" action="{{ url_for('admin.toggle_post_status', post_id=p.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-outline-modern">Durumu Değiştir</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="admin-pagination">
+        {% if posts.has_prev %}<a class="btn btn-outline-modern" href="{{ url_for('admin.posts', page=posts.prev_num, q=q) }}">Önceki</a>{% else %}<span></span>{% endif %}
+        {% if posts.has_next %}<a class="btn btn-hero-modern" href="{{ url_for('admin.posts', page=posts.next_num, q=q) }}">Sonraki</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

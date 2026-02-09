@@ -1,0 +1,1017 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil - {{ current_user.name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section hero-profile">
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="highlight">Profil</span> Yönetimi
+                </h1>
+                <p class="hero-subtitle">
+                    Hesap bilgilerinizi güncelleyin ve güvenliğinizi sağlayın
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Profile Section -->
+<section class="profile-section">
+    <div class="container">
+        <div class="profile-container">
+            <!-- Profile Header Card -->
+            <div class="profile-header-card">
+                <div class="profile-photo-section">
+                    <div class="profile-photo-container">
+                        {% if current_user.profile_photo %}
+                            <img src="{{ current_user.profile_photo }}" alt="{{ current_user.name }}" class="profile-photo">
+                        {% else %}
+                            <div class="profile-photo-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                        <div class="profile-photo-overlay">
+                            <label for="profile-photo-input" class="photo-upload-btn">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <form id="profile-photo-form" method="POST" action="{{ url_for('account.upload_profile_photo') }}" enctype="multipart/form-data" style="display: none;">
+                        <input type="file" id="profile-photo-input" name="profile_photo" accept="image/*" onchange="this.form.submit()">
+                    </form>
+                </div>
+                
+                <div class="profile-info">
+                    <h2 class="profile-name">{{ current_user.name }}</h2>
+                    <p class="profile-email">{{ current_user.email }}</p>
+                     <div class="profile-stats">
+                         <div class="stat-item">
+                             <span class="profile-date">
+                                 {% if current_user.created_at %}
+                                     {{ current_user.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                 {% else %}
+                                     Yeni
+                                 {% endif %}
+                             </span>
+                             <span class="stat-label">Kayıt Tarihi</span>
+                         </div>
+                     </div>
+                             <div class="profile-actions">
+            <button class="btn btn-primary" onclick="showEditModal()">
+                <i class="fas fa-edit"></i> Profili Düzenle
+            </button>
+            <a href="{{ url_for('account.my_services') }}" class="btn btn-success">
+                <i class="fas fa-briefcase"></i> Hizmetlerim
+            </a>
+            <a href="{{ url_for('public.user_public_profile', user_id=current_user.id) }}" class="btn btn-outline" target="_blank" rel="noopener">
+                <i class="fas fa-eye"></i> Profili İncele
+            </a>
+        </div>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'danger' else 'info-circle' if category == 'warning' else 'info-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Profile Content Grid -->
+            <div class="profile-grid">
+                <!-- Personal Information -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-circle"></i> Kişisel Bilgiler</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Ad Soyad</span>
+                                <span class="info-value">{{ current_user.name }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">E-posta</span>
+                                <span class="info-value">{{ current_user.email }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Telefon</span>
+                                <span class="info-value">{{ current_user.phone or 'Belirtilmemiş' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Doğum Tarihi</span>
+                                <span class="info-value">{{ current_user.birthdate.strftime('%d.%m.%Y') if current_user.birthdate else 'Belirtilmemiş' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Adres</span>
+                                <span class="info-value">{{ current_user.address or 'Belirtilmemiş' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Meslek</span>
+                                <span class="info-value">{{ current_user.job or 'Belirtilmemiş' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Services -->
+                {% if active_monthly_services %}
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-star"></i> Aktif Hizmetler</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for service in active_monthly_services %}
+                        <div class="service-item mb-4 p-3 border rounded">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="badge bg-success fs-6">🟢 {{ service.service.name }}</span>
+                                    {% if service.monthly_amount %}
+                                    <div class="mt-1">
+                                        <strong class="text-success">{{ "%.2f"|format(service.monthly_amount) }} ₺/ay</strong>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">Başlangıç: {{ service.created_at.strftime('%d.%m.%Y') }}</small>
+                            </div>
+                            
+                            <!-- Ödeme Bilgileri -->
+                            {% if service.iban and service.recipient_full_name %}
+                            <div class="payment-info bg-light p-3 rounded mb-3">
+                                <h6 class="mb-2"><i class="fas fa-credit-card text-primary"></i> Ödeme Bilgileri</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Alıcı:</small><br>
+                                        <strong>{{ service.recipient_full_name }}</strong>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">IBAN:</small><br>
+                                        <code class="text-primary">{{ service.iban }}</code>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Ödeme Durumu -->
+                            {% if service.last_payment %}
+                                {% if service.last_payment.status == 'pending' %}
+                                <div class="alert alert-warning mb-3">
+                                    <i class="fas fa-clock"></i> <strong>Ödeme Bildirimi Yapıldı</strong><br>
+                                    <small>Yetkili tarafından inceleniyor. Onaylandıktan sonra durum güncellenecektir.</small>
+                                </div>
+                                {% elif service.last_payment.status == 'confirmed' %}
+                                    {% set notification_id = "payment_confirmed_" + service.id|string + "_" + service.last_payment.payment_month.strftime('%Y%m') %}
+                                    {% if not current_user.has_seen_notification('payment_confirmed', notification_id) %}
+                                    <div class="alert alert-success mb-3" data-notification-id="{{ notification_id }}">
+                                        <i class="fas fa-check-circle"></i> <strong>Ödeme Onaylandı</strong><br>
+                                        <small>
+                                          {% set turkish_months = {
+                                            1: 'Ocak', 2: 'Şubat', 3: 'Mart', 4: 'Nisan', 5: 'Mayıs', 6: 'Haziran',
+                                            7: 'Temmuz', 8: 'Ağustos', 9: 'Eylül', 10: 'Ekim', 11: 'Kasım', 12: 'Aralık'
+                                          } %}
+                                          {{ turkish_months[service.last_payment.payment_month.month] }} {{ service.last_payment.payment_month.year }} ayı ödemesi onaylandı.
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+
+                            {# İptal edilmiş ama erişim süresi devam eden hizmet mesajı (kalıcı) #}
+                            {% if service.status == 'cancelled' and service.next_payment_date and service.next_payment_date >= now %}
+                            <div class="alert alert-danger alert-sticky mb-3">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Hizmet iptal edildi.</strong>
+                                <br>
+                                <small>
+                                    Son ödeme tarihine kadar ({{ service.next_payment_date.strftime('%d.%m.%Y') }}) kullanabilirsiniz. Yeni ödeme alınmayacaktır.
+                                    Eğer yanlış olduğunu düşünüyorsanız iptali kaldırmak için
+                                    <a href="{{ url_for('helpdesk.new_ticket',
+                                         topic='Diğer',
+                                         subject='Hizmet İptal İtirazı',
+                                         message=(
+                                           'Hizmet iptali hakkında itiraz ediyorum.\n' ~
+                                           '- Hizmet Türü: ' ~ ( 'Aylık Paket' if service.lead_type == 'monthly' else ('Tek Hizmet' if service.lead_type == 'one_time' else service.lead_type) ) ~ '\n' ~
+                                           '- Paket Adı: ' ~ (service.service.name if service.service else '-') ~ '\n' ~
+                                           '- Oluşturulma: ' ~ service.created_at.strftime('%d.%m.%Y %H:%M') ~ '\n' ~
+                                           ( '- Sonraki Ödeme: ' ~ service.next_payment_date.strftime('%d.%m.%Y') ~ '\n' if service.next_payment_date else '' ) ~
+                                           'Lütfen iptalin kaldırılmasını değerlendirir misiniz?'
+                                         ),
+                                         priority='urgent') }}" class="alert-link">ticket</a> açabilirsiniz.
+                                </small>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Sonraki Ödeme -->
+                            {% if service.next_payment_date %}
+                            <div class="next-payment mb-3">
+                                <h6 class="mb-2"><i class="fas fa-calendar-alt text-info"></i> Sonraki Ödeme</h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-info">{{ service.next_payment_date.strftime('%d.%m.%Y') }}</strong>
+                                        {% if service.next_payment_date < now %}
+                                        <span class="badge bg-danger ms-2">Gecikmiş</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if not service.last_payment or service.last_payment.status != 'pending' %}
+                                    <form method="post" action="{{ url_for('account.notify_payment', lead_id=service.id) }}" style="display:inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success btn-sm" {% if service.status == 'cancelled' %}disabled title="Hizmet iptal edildi"{% endif %}>
+                                            <i class="fas fa-check"></i> Ödendi
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-clock"></i> Bekleniyor
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Company Information -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-building"></i> Şirket Bilgileri</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {{ company_form.hidden_tag() }}
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="{{ company_form.company_name.id }}">Şirket Adı</label>
+                                    {{ company_form.company_name(class="form-control", placeholder="Şirket adınızı girin") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ company_form.tax_office.id }}">Vergi Dairesi</label>
+                                    {{ company_form.tax_office(class="form-control", placeholder="Vergi dairesi") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ company_form.tax_number.id }}">Vergi Numarası</label>
+                                    {{ company_form.tax_number(class="form-control", placeholder="Vergi numarası") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ company_form.address.id }}">Şirket Adresi</label>
+                                    {{ company_form.address(class="form-control", placeholder="Şirket adresi") }}
+                                </div>
+                                <div class="form-group full-width">
+                                    <label for="{{ company_form.notes.id }}">Notlar</label>
+                                    {{ company_form.notes(class="form-control", rows=3, placeholder="Ek notlarınız...") }}
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Kaydet
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+
+                <!-- Security Settings -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-shield-alt"></i> Güvenlik Ayarları</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="{{ form.old_password.id }}">Mevcut Şifre</label>
+                                    {{ form.old_password(class="form-control", placeholder="Mevcut şifrenizi girin") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.new_password.id }}">Yeni Şifre</label>
+                                    {{ form.new_password(class="form-control", placeholder="Yeni şifrenizi girin") }}
+                                    <div class="policy-inline" style="margin-top:6px;font-size:12px;color:#64748b;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                        <span style="display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-shield-alt"></i> Şifre politikası:</span>
+                                        <span style="background:#eef2ff;color:#4f46e5;padding:2px 8px;border-radius:999px;">8+ karakter</span>
+                                        <span style="background:#ecfeff;color:#0e7490;padding:2px 8px;border-radius:999px;">A-Z</span>
+                                        <span style="background:#f0fdf4;color:#15803d;padding:2px 8px;border-radius:999px;">a-z</span>
+                                        <span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:999px;">0-9</span>
+                                        <span style="background:#f5f3ff;color:#6d28d9;padding:2px 8px;border-radius:999px;">Sembol</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="{{ form.confirm_new_password.id }}">Yeni Şifre (Tekrar)</label>
+                                    {{ form.confirm_new_password(class="form-control", placeholder="Yeni şifrenizi tekrar girin") }}
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-warning" onclick="showPasswordChangeModal()">
+                                    <i class="fas fa-key"></i> Şifre Değiştir
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Account Management -->
+                <div class="profile-card danger-zone">
+                    <div class="card-header">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Hesap Yönetimi</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="danger-actions">
+                            <div class="danger-item">
+                                <div class="danger-info">
+                                    <h4>Hesabı Sil</h4>
+                                    <p>Hesabınızı ve tüm verilerinizi kalıcı olarak silin. Bu işlem geri alınamaz.</p>
+                                </div>
+                                <button class="btn btn-danger" onclick="showDeleteModal()">
+                                    <i class="fas fa-trash-alt"></i> Hesabı Sil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="editProfileModalLabel">
+                    <i class="fas fa-edit text-primary"></i> Profili Düzenle
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editProfileForm" method="POST" action="{{ url_for('account.update_profile') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit_name">Ad Soyad</label>
+                                <input type="text" class="form-control" id="edit_name" name="name" value="{{ current_user.name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit_phone">Telefon</label>
+                                <input type="tel" class="form-control" id="edit_phone" name="phone" value="{{ current_user.phone or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit_birthdate">Doğum Tarihi</label>
+                                <input type="date" class="form-control" id="edit_birthdate" name="birthdate" value="{{ current_user.birthdate.strftime('%Y-%m-%d') if current_user.birthdate else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit_job">Meslek</label>
+                                <input type="text" class="form-control" id="edit_job" name="job" value="{{ current_user.job or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_address">Adres</label>
+                        <textarea class="form-control" id="edit_address" name="address" rows="3">{{ current_user.address or '' }}</textarea>
+                    </div>
+                    <hr>
+                    <h6><i class="fas fa-envelope"></i> E-posta Değişikliği</h6>
+                    <div class="alert alert-info">
+                        <small>E-posta değiştirmek için önce mevcut e-postanıza, sonra yeni e-postanıza onay kodu gönderilecektir.</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="edit_email">Yeni E-posta (isteğe bağlı)</label>
+                        <input type="email" class="form-control" id="edit_email" name="new_email" placeholder="Yeni e-posta adresiniz">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="updateProfile()">
+                    <i class="fas fa-save"></i> Kaydet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="deleteAccountModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger"></i> Hesap Silme Onayı
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Dikkat!</h6>
+                    <p class="mb-0">Bu işlem geri alınamaz. Hesabınız ve tüm verileriniz kalıcı olarak silinecektir.</p>
+                </div>
+                
+                <div id="deleteStep1" style="display: block;">
+                    <p>E-posta adresinize onay kodu göndereceğiz. Devam etmek istediğinizden emin misiniz?</p>
+                    <button type="button" class="btn btn-danger" onclick="sendDeleteCode()">
+                        <i class="fas fa-envelope"></i> Onay Kodu Gönder
+                    </button>
+                </div>
+                
+                <div id="deleteStep2" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> E-posta adresinize gönderilen onay kodunu girin.
+                    </div>
+                    <form id="deleteAccountForm" method="POST" action="{{ url_for('account.confirm_delete_account') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="form-group mb-3">
+                            <label for="deleteCode">Onay Kodu:</label>
+                            <input type="text" class="form-control" id="deleteCode" name="code" placeholder="6 haneli kod" maxlength="6" required>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">
+                        <i class="fas fa-trash-alt"></i> Hesabımı Sil
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Change Modal -->
+<div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="passwordChangeModalLabel">
+                    <i class="fas fa-key text-warning"></i> Şifre Değiştir
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="passwordStep1" style="display: block;">
+                    <p>Şifrenizi değiştirmek için e-posta adresinize onay kodu göndereceğiz.</p>
+                    <form id="passwordChangeRequestForm">
+                        <div class="form-group mb-3">
+                            <label for="currentPassword">Mevcut Şifreniz:</label>
+                            <input type="password" class="form-control" id="currentPassword" name="current_password" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="newPassword">Yeni Şifreniz:</label>
+                            <input type="password" class="form-control" id="newPassword" name="new_password" required>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="confirmPassword">Yeni Şifre (Tekrar):</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-warning" onclick="sendPasswordChangeCode()">
+                        <i class="fas fa-envelope"></i> Onay Kodu Gönder
+                    </button>
+                </div>
+                
+                <div id="passwordStep2" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> E-posta adresinize gönderilen onay kodunu girin.
+                    </div>
+                    <form id="passwordChangeForm" method="POST" action="{{ url_for('account.confirm_password_change') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" id="hiddenCurrentPassword" name="current_password">
+                        <input type="hidden" id="hiddenNewPassword" name="new_password">
+                        <div class="form-group mb-3">
+                            <label for="passwordCode">Onay Kodu:</label>
+                            <input type="text" class="form-control" id="passwordCode" name="code" placeholder="6 haneli kod" maxlength="6" required>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-warning" onclick="confirmPasswordChange()">
+                        <i class="fas fa-key"></i> Şifreyi Değiştir
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Profile Styles */
+.hero-profile {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.profile-header-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.profile-photo-section {
+    position: relative;
+}
+
+.profile-photo-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 40px;
+}
+
+.profile-photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 50%;
+}
+
+.profile-photo-container:hover .profile-photo-overlay {
+    opacity: 1;
+}
+
+.photo-upload-btn {
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    transition: background 0.3s;
+}
+
+.photo-upload-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.profile-email {
+    font-size: 1.1rem;
+    color: #718096;
+    margin-bottom: 20px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number, .profile-date {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.profile-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.info-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.info-value {
+    color: #718096;
+}
+
+.form-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(240, 147, 251, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+
+
+
+
+.danger-zone {
+    border: 2px solid #fed7d7;
+}
+
+.danger-actions {
+    display: grid;
+    gap: 20px;
+}
+
+.danger-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #fff5f5;
+    border-radius: 10px;
+    border: 1px solid #fed7d7;
+}
+
+.danger-info h4 {
+    color: #c53030;
+    margin-bottom: 5px;
+}
+
+.danger-info p {
+    color: #718096;
+    margin: 0;
+}
+
+.alert {
+    border-radius: 15px;
+    border: none;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: #f0fff4;
+    color: #22543d;
+}
+
+.alert-danger {
+    background: #fff5f5;
+    color: #c53030;
+}
+
+.alert-warning {
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.alert-info {
+    background: #ebf8ff;
+    color: #2c5282;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-header-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-stats {
+        justify-content: center;
+    }
+    
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .danger-item {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+}
+</style>
+
+<script>
+function showEditModal() {
+    var modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+    modal.show();
+}
+
+function updateProfile() {
+    document.getElementById('editProfileForm').submit();
+}
+
+function showPasswordChangeModal() {
+    var modal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
+    modal.show();
+}
+
+function sendPasswordChangeCode() {
+    var currentPassword = document.getElementById('currentPassword').value;
+    var newPassword = document.getElementById('newPassword').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Lütfen tüm alanları doldurun.');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        alert('Yeni şifreler eşleşmiyor.');
+        return;
+    }
+    
+    // Hidden inputlara değerleri kopyala
+    document.getElementById('hiddenCurrentPassword').value = currentPassword;
+    document.getElementById('hiddenNewPassword').value = newPassword;
+    
+    // AJAX ile kod gönderme isteği
+    fetch('/account/send-password-change-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            current_password: currentPassword,
+            new_password: newPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('passwordStep1').style.display = 'none';
+            document.getElementById('passwordStep2').style.display = 'block';
+        } else {
+            alert(data.message || 'Hata oluştu.');
+        }
+    })
+    .catch(error => {
+        alert('Bir hata oluştu.');
+    });
+}
+
+function confirmPasswordChange() {
+    document.getElementById('passwordChangeForm').submit();
+}
+
+function showDeleteModal() {
+    var modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+    modal.show();
+}
+
+function sendDeleteCode() {
+    // AJAX ile hesap silme kodu gönderme isteği
+    fetch('/account/send-delete-code', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('deleteStep1').style.display = 'none';
+            document.getElementById('deleteStep2').style.display = 'block';
+        } else {
+            alert(data.message || 'Hata oluştu.');
+        }
+    })
+    .catch(error => {
+        alert('Bir hata oluştu.');
+    });
+}
+
+function confirmDeleteAccount() {
+    document.getElementById('deleteAccountForm').submit();
+}
+
+// Mark notifications as seen when they are displayed
+document.addEventListener('DOMContentLoaded', function() {
+    const notifications = document.querySelectorAll('.alert-success[data-notification-id]');
+    notifications.forEach(function(notification) {
+        const notificationId = notification.getAttribute('data-notification-id');
+        const notificationType = 'payment_confirmed';
+        
+        // Mark as seen via AJAX
+        fetch('{{ url_for("account.mark_notification_seen") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                type: notificationType,
+                id: notificationId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Notification marked as seen:', notificationId);
+            }
+        })
+        .catch(error => {
+            console.error('Error marking notification as seen:', error);
+        });
+    });
+});
+
+</script>
+{% endblock %} 

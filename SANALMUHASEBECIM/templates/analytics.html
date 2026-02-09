@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Sistem Analitikleri</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Post İstatistikleri</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Başlık</th>
+                                    <th>Yazar</th>
+                                    <th>Yorum Sayısı</th>
+                                    <th>Beğeni Sayısı</th>
+                                    <th>Son 7 Gün Yorum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in post_stats %}
+                                <tr>
+                                    <td>{{ stat.title }}</td>
+                                    <td>{{ stat.author }}</td>
+                                    <td>{{ stat.comment_count }}</td>
+                                    <td>{{ stat.like_count }}</td>
+                                    <td>{{ stat.recent_comments }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3>Kullanıcı Aktivite Analizi</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Post Sayısı</th>
+                                    <th>Yorum Sayısı</th>
+                                    <th>Beğeni Sayısı</th>
+                                    <th>Son Aktivite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in user_stats %}
+                                <tr>
+                                    <td>{{ stat.name }}</td>
+                                    <td>{{ stat.total_posts }}</td>
+                                    <td>{{ stat.total_comments }}</td>
+                                    <td>{{ stat.total_likes }}</td>
+                                    <td>
+                                        {% if stat.last_post_date or stat.last_comment_date %}
+                                            {% if stat.last_post_date and stat.last_comment_date %}
+                                                {% if stat.last_post_date > stat.last_comment_date %}
+                                                    Post: {{ stat.last_post_date.strftime('%d-%m-%Y') }}
+                                                {% else %}
+                                                    Yorum: {{ stat.last_comment_date.strftime('%d-%m-%Y') }}
+                                                {% endif %}
+                                            {% elif stat.last_post_date %}
+                                                Post: {{ stat.last_post_date.strftime('%d-%m-%Y') }}
+                                            {% else %}
+                                                Yorum: {{ stat.last_comment_date.strftime('%d-%m-%Y') }}
+                                            {% endif %}
+                                        {% else %}
+                                            Henüz aktivite yok
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

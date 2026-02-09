@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}{{ service.name }} - Hizmet{% endblock %}
+{% block meta_description %}{{ service.summary or 'Uzaktan muhasebe ve vergi danışmanlığı hizmeti' }}{% endblock %}
+{% block canonical %}{{ url_for('public.service_detail', slug=service.slug, _external=True) }}{% endblock %}
+{% block content %}
+
+<!-- Service Hero -->
+<section class="service-hero">
+  <div class="service-hero-overlay"></div>
+  <div class="container">
+    <div class="service-hero-content">
+      <div class="service-hero-badge"><i class="fas fa-briefcase"></i> Profesyonel Hizmet</div>
+      <h1 class="service-hero-title">{{ service.name }}</h1>
+      {% if service.summary %}
+      <p class="service-hero-subtitle">{{ service.summary }}</p>
+      {% endif %}
+      <div class="service-hero-tags">
+        <span class="tag"><i class="fas fa-shield-alt"></i> KVKK Uyumlu</span>
+        <span class="tag"><i class="fas fa-bolt"></i> Hızlı Dönüş</span>
+        <span class="tag"><i class="fas fa-user-tie"></i> Uzman Ekip</span>
+      </div>
+    </div>
+  </div>
+  <div class="service-hero-shapes"></div>
+  <div class="service-hero-gradient"></div>
+  <div class="service-hero-fade"></div>
+  <div class="service-hero-bottom"></div>
+</section>
+
+<!-- Service Layout -->
+<section class="service-section">
+  <div class="container service-layout">
+    <article class="service-content-card">
+      <div class="service-content-header">
+        <div class="icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div>
+          <h2>Hizmet Hakkında</h2>
+          <p class="muted">İhtiyacınıza özel, ölçeklenebilir ve güvenli çözümler</p>
+        </div>
+      </div>
+      {% if service.description %}
+      <div class="service-content">
+        {{ service.description|safe }}
+      </div>
+      {% else %}
+      <div class="service-content">
+        <p>Bu hizmet için açıklama yakında eklenecek.</p>
+      </div>
+      {% endif %}
+
+      <div class="service-benefits">
+        <div class="benefit"><i class="fas fa-check-circle"></i> Şeffaf süreç ve raporlama</div>
+        <div class="benefit"><i class="fas fa-check-circle"></i> Stratejik öneriler</div>
+        <div class="benefit"><i class="fas fa-check-circle"></i> Sürekli destek</div>
+      </div>
+    </article>
+
+    <aside id="quote" class="quote-card">
+      <div class="quote-header">
+        <div class="quote-icon"><i class="fas fa-handshake"></i></div>
+        <div>
+          <h3>Ön Görüşme Talep Et</h3>
+          <p class="muted">Bu paketle ilgili detayları paylaşın, size özel teklif hazırlayalım</p>
+        </div>
+      </div>
+
+      {% if current_user.is_authenticated %}
+        <!-- Hizmet talebi oluşturma yerine doğrudan randevu planlama sayfasına git -->
+        <div class="quote-form">
+          <div class="form-actions">
+            <a href="{{ url_for('booking.new_appointment', service_id=service.id) }}" class="btn btn-primary btn-block">
+              <i class="fas fa-calendar-check"></i> Ön Görüşme Talep Et
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <!-- Giriş yapmamış kullanıcılar için kayıt olma yönlendirmesi -->
+        <div class="login-prompt">
+          <div class="login-prompt-icon">
+            <i class="fas fa-user-lock"></i>
+          </div>
+          <h4>Giriş Yapın</h4>
+          <p>Ön görüşme talep etmek için lütfen giriş yapın veya kayıt olun.</p>
+          <div class="login-actions">
+            <a href="{{ url_for('account.login') }}" class="btn btn-primary">
+              <i class="fas fa-sign-in-alt"></i> Giriş Yap
+            </a>
+            <a href="{{ url_for('account.register') }}" class="btn btn-outline-primary">
+              <i class="fas fa-user-plus"></i> Kayıt Ol
+            </a>
+          </div>
+        </div>
+      {% endif %}
+          </div>
+        </div>
+
+        <button class="btn btn-hero-modern w-full" type="submit">
+          <i class="fas fa-paper-plane"></i>
+          <span>Teklif İste</span>
+        </button>
+
+        <div class="quote-trust">
+          <span><i class="fas fa-shield-alt"></i> Güvenli</span>
+          <span><i class="fas fa-bolt"></i> Hızlı Destek</span>
+          <span><i class="fas fa-certificate"></i> Sertifikalı</span>
+        </div>
+      </form>
+    </aside>
+  </div>
+</section>
+
+{% endblock %}

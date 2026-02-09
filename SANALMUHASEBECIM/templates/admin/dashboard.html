@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+
+<section class="hero-section hero-services admin-hero">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Admin <span class="gradient-text">Dashboard</span></h1>
+        <p class="hero-subtitle">Sisteminize ait özet metrikler ve son aktiviteler</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="admin-section">
+  <div class="container">
+    <div class="admin-quick">
+             <h2 class="panel-header" style="border:none; padding-left:0; gap:.5rem">
+         <i class="fas fa-compass"></i><span>Hızlı Erişim</span>
+       </h2>
+      <div class="admin-quick-grid">
+        <a class="quick-card" href="{{ url_for('admin.users') }}">
+          <div class="quick-icon"><i class="fas fa-users"></i></div>
+          <div class="quick-info"><span>Kullanıcılar</span><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.posts') }}">
+          <div class="quick-icon"><i class="fas fa-newspaper"></i></div>
+          <div class="quick-info"><span>Gönderiler</span><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.comments') }}">
+          <div class="quick-icon"><i class="fas fa-comments"></i></div>
+          <div class="quick-info">
+            <span>Yorumlar</span>
+            <span id="commentsBadge" class="badge-red" style="display: none;">0</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.appointments') }}">
+          <div class="quick-icon"><i class="fas fa-calendar-check"></i></div>
+          <div class="quick-info">
+            <span>Randevular</span>
+            <span id="appointmentsBadge" class="badge-red" style="display: none;">0</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.leads') }}">
+          <div class="quick-icon"><i class="fas fa-user-plus"></i></div>
+          <div class="quick-info">
+            <span>Leads</span>
+            <span id="leadsBadge" class="badge-red" style="display: none;">0</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.services') }}">
+          <div class="quick-icon"><i class="fas fa-briefcase"></i></div>
+          <div class="quick-info"><span>Hizmetler</span><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.tickets') }}">
+          <div class="quick-icon"><i class="fas fa-ticket-alt"></i></div>
+          <div class="quick-info">
+            <span>Tickets</span>
+            <span id="ticketsBadge" class="badge-red" style="display: none;">0</span>
+            <i class="fas fa-arrow-right"></i>
+          </div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.subscribers') }}">
+          <div class="quick-icon"><i class="fas fa-envelope-open-text"></i></div>
+          <div class="quick-info"><span>Aboneler</span><i class="fas fa-arrow-right"></i></div>
+        </a>
+        <a class="quick-card" href="{{ url_for('admin.analytics') }}">
+          <div class="quick-icon"><i class="fas fa-chart-bar"></i></div>
+          <div class="quick-info"><span>Analytics</span><i class="fas fa-arrow-right"></i></div>
+        </a>
+      </div>
+    </div>
+    <div class="admin-stats admin-stats-glow">
+      <div class="stat-card stat-anim">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Kullanıcı</div>
+          <div class="stat-value" data-count="{{ total_users }}">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-anim">
+        <div class="stat-icon"><i class="fas fa-newspaper"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Gönderi</div>
+          <div class="stat-value" data-count="{{ total_posts }}">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-anim">
+        <div class="stat-icon"><i class="fas fa-comments"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Yorum</div>
+          <div class="stat-value" data-count="{{ total_comments }}">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-anim">
+        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Randevu</div>
+          <div class="stat-value" data-count="{{ total_appointments }}">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-anim">
+        <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Lead</div>
+          <div class="stat-value" data-count="{{ total_leads }}">0</div>
+        </div>
+      </div>
+      <div class="stat-card stat-anim">
+        <div class="stat-icon"><i class="fas fa-briefcase"></i></div>
+        <div class="stat-info">
+          <div class="stat-label">Hizmet</div>
+          <div class="stat-value" data-count="{{ total_services }}">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-panels">
+      <div class="panel-card timeline">
+        <div class="panel-header"><i class="fas fa-user"></i><span>Yeni Kullanıcılar</span></div>
+        <ul class="panel-list">
+          {% for u in recent_users %}
+          <li class="timeline-item">
+            <div class="avatar avatar-ring">{{ (u.name or 'U')[:2]|upper }}</div>
+            <div class="item-content">
+              <div class="item-primary-row">
+                <span class="item-primary">{{ u.name }}</span>
+                {% if u.email %}<span class="chip">{{ u.email }}</span>{% endif %}
+              </div>
+              <div class="item-meta-row">
+                <span class="chip chip-muted">{{ u.created_at.strftime('%d.%m.%Y') if u.created_at }}</span>
+                <span class="chip chip-success">Yeni</span>
+              </div>
+            </div>
+          </li>
+          {% else %}<li>Veri yok</li>{% endfor %}
+        </ul>
+      </div>
+      <div class="panel-card timeline">
+        <div class="panel-header"><i class="fas fa-newspaper"></i><span>Son Gönderiler</span></div>
+        <ul class="panel-list">
+          {% for p in recent_posts %}
+          <li class="timeline-item">
+            <div class="avatar"><i class="fas fa-file-alt"></i></div>
+            <div class="item-content">
+              <div class="item-primary-row">
+                <span class="item-primary">{{ p.title }}</span>
+              </div>
+              <div class="item-meta-row">
+                {% if p.author %}<span class="chip">{{ p.author.name }}</span>{% endif %}
+                <span class="chip {{ 'chip-success' if p.is_active else 'chip-warning' }}">{{ 'Aktif' if p.is_active else 'Pasif' }}</span>
+                <span class="chip chip-muted">{{ p.post_date.strftime('%d.%m.%Y') }}</span>
+              </div>
+            </div>
+          </li>
+          {% else %}<li>Veri yok</li>{% endfor %}
+        </ul>
+      </div>
+      <div class="panel-card timeline">
+        <div class="panel-header"><i class="fas fa-calendar"></i><span>Son Randevular</span></div>
+        <ul class="panel-list">
+          {% for a in recent_appointments %}
+          <li class="timeline-item">
+            <div class="avatar"><i class="fas fa-calendar-day"></i></div>
+            <div class="item-content">
+              <div class="item-primary-row">
+                <span class="item-primary">{{ a.email }}</span>
+              </div>
+              <div class="item-meta-row">
+                <span class="chip chip-muted">{{ a.appointment_datetime.strftime('%d.%m.%Y %H:%M') }}</span>
+                {% if a.status %}
+                <span class="chip 
+                  {% if a.status == 'confirmed' %}chip-success{% elif a.status in ['pending','awaiting_payment'] %}chip-warning{% elif a.status == 'cancelled' %}chip-danger{% else %}chip-muted{% endif %}">
+                  {{ a.status|replace('_',' ')|title }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </li>
+          {% else %}<li>Veri yok</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+<script>
+(function() {
+  let pollTimeout;
+  
+  // Badge'leri güncelle
+  async function updateBadges() {
+    try {
+      // Tickets badge
+      const ticketsResponse = await fetch('{{ url_for("admin.new_tickets_count") }}');
+      if (ticketsResponse.ok) {
+        const ticketsData = await ticketsResponse.json();
+        console.log('Tickets data:', ticketsData); // Debug log
+        updateBadge('ticketsBadge', ticketsData.new_count);
+      }
+      
+      // Leads badge (pending leads)
+      const leadsResponse = await fetch('{{ url_for("admin.pending_leads_count") }}');
+      if (leadsResponse.ok) {
+        const leadsData = await leadsResponse.json();
+        console.log('Leads data:', leadsData); // Debug log
+        updateBadge('leadsBadge', leadsData.pending_count);
+      }
+      
+      // Appointments badge (pending appointments)
+      const appointmentsResponse = await fetch('{{ url_for("admin.pending_appointments_count") }}');
+      if (appointmentsResponse.ok) {
+        const appointmentsData = await appointmentsResponse.json();
+        console.log('Appointments data:', appointmentsData); // Debug log
+        updateBadge('appointmentsBadge', appointmentsData.pending_count);
+      }
+      
+      // Comments badge (pending comments)
+      const commentsResponse = await fetch('{{ url_for("admin.pending_comments_count") }}');
+      if (commentsResponse.ok) {
+        const commentsData = await commentsResponse.json();
+        console.log('Comments data:', commentsData); // Debug log
+        updateBadge('commentsBadge', commentsData.pending_count);
+      }
+      
+    } catch (error) {
+      console.error('Badge güncelleme hatası:', error);
+    }
+  }
+  
+  // Badge'i güncelle
+  function updateBadge(badgeId, count) {
+    console.log(`Updating badge ${badgeId} with count: ${count}`); // Debug log
+    const badge = document.getElementById(badgeId);
+    if (badge) {
+      console.log(`Found badge element:`, badge); // Debug log
+      if (count > 0) {
+        badge.style.display = 'inline-block';
+        badge.textContent = count;
+        console.log(`Badge ${badgeId} now visible with count ${count}`); // Debug log
+        
+        // Pulse animasyonu ekle
+        badge.style.animation = 'pulse 1s ease-in-out';
+        setTimeout(() => {
+          badge.style.animation = '';
+        }, 1000);
+      } else {
+        badge.style.display = 'none';
+        console.log(`Badge ${badgeId} now hidden`); // Debug log
+      }
+    } else {
+      console.error(`Badge element with ID '${badgeId}' not found!`); // Debug log
+    }
+  }
+  
+  // Polling başlat
+  function startPolling() {
+    pollTimeout = setTimeout(() => {
+      console.log('Polling for updates...'); // Debug log
+      updateBadges();
+      startPolling();
+    }, 2000); // 2 saniyede bir kontrol et
+  }
+  
+  // CSS animasyonları ekle
+  const style = document.createElement('style');
+  style.textContent = `
+    .badge-red {
+      background: #ef4444;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+      min-width: 1.5rem;
+      text-align: center;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  
+  
+  // Sayfa yüklendiğinde başlat
+  updateBadges();
+  startPolling();
+  
+  // Sayfa kapatılırken polling'i durdur
+  window.addEventListener('beforeunload', () => {
+    if (pollTimeout) {
+      clearTimeout(pollTimeout);
+    }
+  });
+})();
+</script>

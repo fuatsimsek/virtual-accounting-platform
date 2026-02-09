@@ -1,0 +1,1200 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.seo_title or post.title }} - Blog{% endblock %}
+{% block meta_description %}{{ post.seo_desc or (post.subtitle or post.excerpt) }}{% endblock %}
+{% block canonical %}{{ url_for('blog.post_detail', slug=post.slug, _external=True) }}{% endblock %}
+{% block og_image %}{{ post.cover.url if post.cover else url_for('static', filename='img/post-bg.jpg', _external=True) }}{% endblock %}
+{% block content %}
+
+<!-- Sosyal Medya Paylaşım JavaScript -->
+<script>
+function shareToFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent('{{ post.title }}');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+}
+
+function shareToTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent('{{ post.title }}');
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank', 'width=600,height=400');
+}
+
+function shareToLinkedIn() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent('{{ post.title }}');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=400');
+}
+
+function shareToWhatsApp() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent('{{ post.title }}');
+    window.open(`https://wa.me/?text=${title}%20${url}`, '_blank');
+}
+
+function copyPostLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(function() {
+        // Başarılı kopyalama mesajı göster
+        const copyBtn = document.querySelector('.share-copy');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i><span>Kopyalandı!</span>';
+        copyBtn.style.background = '#10b981';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '';
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Link kopyalanamadı:', err);
+        alert('Link kopyalanamadı. Lütfen manuel olarak kopyalayın.');
+    });
+}
+
+// Tarih formatını güncelle
+function updateDateFormats() {
+    const dateElements = document.querySelectorAll('.post-date[data-date]');
+    
+    dateElements.forEach(element => {
+        const dateString = element.getAttribute('data-date');
+        if (dateString) {
+            const postDate = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - postDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+            const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+            
+            let timeAgo = '';
+            if (diffDays > 1) {
+                timeAgo = `${diffDays} gün önce`;
+            } else if (diffDays === 1) {
+                timeAgo = '1 gün önce';
+            } else if (diffHours > 1) {
+                timeAgo = `${diffHours} saat önce`;
+            } else if (diffHours === 1) {
+                timeAgo = '1 saat önce';
+            } else if (diffMinutes > 1) {
+                timeAgo = `${diffMinutes} dakika önce`;
+            } else {
+                timeAgo = 'Az önce';
+            }
+            
+            element.textContent = timeAgo;
+        }
+    });
+}
+
+// Sayfa yüklendiğinde tarihleri güncelle
+document.addEventListener('DOMContentLoaded', updateDateFormats);
+</script>
+
+<!-- Hero Post Header -->
+<div class="post-hero">
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="post-category">
+                <span class="category-badge">
+                    <i class="fas fa-newspaper"></i>
+                    Blog Yazısı
+                </span>
+            </div>
+            
+            <h1 class="hero-title">{{ post.title }}</h1>
+            
+            {% if post.subtitle %}
+            <p class="hero-subtitle">{{ post.subtitle }}</p>
+            {% endif %}
+            
+            <div class="post-meta">
+                <div class="author-section">
+                    <div class="author-avatar">
+                        {% if post.author and post.author.profile_photo %}
+                        <a href="{{ url_for('public.user_public_profile', user_id=post.author.id) }}">
+                          <img class="avatar-img" src="{{ post.author.profile_photo }}" alt="{{ post.author.name }}">
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('public.user_public_profile', user_id=post.author.id) }}" class="avatar-circle">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="author-info">
+                        <div class="author-name"><a href="{{ url_for('public.user_public_profile', user_id=post.author.id) }}" style="color:white;text-decoration:none;font-weight:600;">{{ post.author.name }}</a></div>
+                        <div class="post-date" data-date="{{ (post.published_at or post.post_date).isoformat() }}">{{ (post.published_at or post.post_date).strftime('%d %B %Y') }}</div>
+                    </div>
+                </div>
+                
+                <div class="post-stats">
+                    <div class="stat-item">
+                        <i class="far fa-clock"></i>
+                        <span>{% set word_count = post.post_text.split()|length %}{% set reading_time = (word_count / 200)|round|int %}{% if reading_time < 1 %}1{% else %}{{ reading_time }}{% endif %} dk okuma</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="far fa-comment"></i>
+                        <span>{{ post.comments|length }} yorum</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="far fa-heart"></i>
+                        <span>{{ post.likes|length }} beğeni</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Post Content -->
+<article class="post-article">
+    <div class="container">
+        <div class="article-wrapper">
+
+
+            <div class="content-card">
+                <div class="content-text" id="postContentHtml">{{ post.post_text|safe }}</div>
+            </div>
+            
+            <!-- Sosyal Medya Paylaşım Butonları -->
+            <div class="social-share-section">
+                <h4 class="share-title">
+                    <i class="fas fa-share-alt"></i>
+                    Bu Yazıyı Paylaş
+                </h4>
+                <div class="social-share-buttons">
+                    <button class="share-btn share-facebook" onclick="shareToFacebook()" title="Facebook'ta Paylaş">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Facebook</span>
+                    </button>
+                    <button class="share-btn share-twitter" onclick="shareToTwitter()" title="Twitter'da Paylaş">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </button>
+                    <button class="share-btn share-linkedin" onclick="shareToLinkedIn()" title="LinkedIn'de Paylaş">
+                        <i class="fab fa-linkedin-in"></i>
+                        <span>LinkedIn</span>
+                    </button>
+                    <button class="share-btn share-whatsapp" onclick="shareToWhatsApp()" title="WhatsApp'ta Paylaş">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </button>
+                    <button class="share-btn share-copy" onclick="copyPostLink()" title="Linki Kopyala">
+                        <i class="fas fa-link"></i>
+                        <span>Linki Kopyala</span>
+                    </button>
+                </div>
+            </div>
+            <script>
+            (function() {
+              try {
+                var root = document.getElementById('postContentHtml');
+                if (!root) return;
+                var paras = root.querySelectorAll('p');
+                paras.forEach(function(p){
+                  var txt = (p.textContent || '').replace(/\u00A0/g, ' ').trim();
+                  var html = (p.innerHTML || '').replace(/&nbsp;/gi, '').replace(/<br\s*\/?>(\s|\u00A0)*/gi, '').trim();
+                  if (!txt && !html) {
+                    p.remove();
+                  }
+                });
+              } catch (e) {}
+            })();
+            </script>
+
+            <!-- Enhanced Like Button -->
+            {% if current_user.is_authenticated %}
+            <div class="post-actions">
+                <button class="btn-like {% if current_user in post.likes|map(attribute='user') %}liked{% endif %}" data-post-id="{{ post.id }}">
+                    <div class="like-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <span class="like-count">{{ post.likes|length }}</span>
+                    <span class="like-text">Beğen</span>
+                </button>
+            </div>
+            {% else %}
+            <div class="login-prompt">
+                <div class="prompt-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="prompt-text">
+                    Beğeni yapmak için <a href="{{ url_for('account.login') }}">giriş yapın</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</article>
+
+<!-- Enhanced Comments Section -->
+<section class="comments-section">
+    <div class="container">
+        <div class="comments-wrapper">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="far fa-comments"></i>
+                    Yorumlar
+                    <span class="comment-count">({{ post.comments|length }})</span>
+                </h2>
+            </div>
+            
+            {% if current_user.is_authenticated %}
+            <div class="comment-form-card">
+                <form method="POST" action="{{ url_for('blog.add_comment', slug=post.slug) }}" class="comment-form">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        <div class="input-wrapper">
+                            {{ form.content(class="comment-input", rows=4, placeholder="Düşüncelerinizi paylaşın...") }}
+                            <div class="input-border"></div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Yorum Gönder</span>
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="login-prompt">
+                <div class="prompt-icon">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <div class="prompt-text">
+                    Yorum yapmak için <a href="{{ url_for('account.login') }}">giriş yapın</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="comments-list">
+                {% for comment in post.comments if not comment.parent_id %}
+                <div class="comment-card" id="comment-{{ comment.id }}">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            <div class="author-avatar">
+                                {% if comment.author and comment.author.profile_photo %}
+                                <a href="{{ url_for('public.user_public_profile', user_id=comment.author.id) }}">
+                                  <img class="avatar-img" src="{{ comment.author.profile_photo }}" alt="{{ comment.author.name }}">
+                                </a>
+                                {% else %}
+                                <div class="avatar-circle">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="author-info">
+                                <div class="author-name"><a href="{{ url_for('public.user_public_profile', user_id=comment.author.id) }}" style="color:inherit;text-decoration:none;">{{ comment.author.name }}</a></div>
+                                {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+                                <div class="comment-date">{{ '%02d'|format(comment.date.day) }} {{ tr_months[comment.date.month] }} {{ comment.date.year }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comment-content">
+                        <p>{{ comment.content }}</p>
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <div class="comment-actions">
+                        <button class="btn-action like-comment {% if current_user in comment.likes|map(attribute='user') %}liked{% endif %}" data-comment-id="{{ comment.id }}">
+                            <i class="fas fa-heart"></i>
+                            <span class="like-count">{{ comment.likes|length }}</span>
+                        </button>
+                        <button class="btn-action reply-comment" data-comment-id="{{ comment.id }}">
+                            <i class="fas fa-reply"></i>
+                            <span>Yanıtla</span>
+                        </button>
+                    </div>
+                    
+                    <div class="reply-form" id="reply-form-{{ comment.id }}">
+                        <div class="input-wrapper">
+                            <textarea class="reply-input" rows="3" placeholder="Yanıtınızı yazın..."></textarea>
+                            <div class="input-border"></div>
+                        </div>
+                        <div class="reply-actions">
+                            <button class="btn-submit submit-reply" data-comment-id="{{ comment.id }}">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Yanıtla</span>
+                            </button>
+                            <button class="btn-cancel cancel-reply" data-comment-id="{{ comment.id }}">
+                                <span>İptal</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="replies">
+                        {% for reply in comment.replies %}
+                        <div class="reply-card" id="comment-{{ reply.id }}">
+                            <div class="reply-header">
+                                <div class="reply-author">
+                                    <div class="author-avatar">
+                                        {% if reply.author and reply.author.profile_photo %}
+                                        <a href="{{ url_for('public.user_public_profile', user_id=reply.author.id) }}">
+                                          <img class="avatar-img" src="{{ reply.author.profile_photo }}" alt="{{ reply.author.name }}">
+                                        </a>
+                                        {% else %}
+                                        <div class="avatar-circle">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="author-info">
+                                        <div class="author-name"><a href="{{ url_for('public.user_public_profile', user_id=reply.author.id) }}" style="color:inherit;text-decoration:none;">{{ reply.author.name }}</a></div>
+                                        {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+                                        <div class="reply-date">{{ '%02d'|format(reply.date.day) }} {{ tr_months[reply.date.month] }} {{ reply.date.year }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="reply-content">
+                                <p>{{ reply.content }}</p>
+                            </div>
+                            
+                            {% if current_user.is_authenticated %}
+                            <div class="reply-actions">
+                                <button class="btn-action like-comment {% if current_user in reply.likes|map(attribute='user') %}liked{% endif %}" data-comment-id="{{ reply.id }}">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="like-count">{{ reply.likes|length }}</span>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Post Actions -->
+{% if post.user == current_user %}
+<div class="post-actions-footer">
+    <div class="container">
+        <div class="actions-wrapper">
+            <a href="{{ url_for('blog.edit_post', slug=post.slug) }}" class="btn-action-edit">
+                <i class="fas fa-edit"></i>
+                <span>Düzenle</span>
+            </a>
+            <button type="button" id="deleteBtn" class="btn-action-delete">
+                <i class="fas fa-trash-alt"></i>
+                <span>Sil</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<form id="deleteForm" action="{{ url_for('blog.delete_post', post_id=post.id) }}" method="POST" style="display: none;">
+  {{ csrf_token() }}
+</form>
+
+<style>
+/* Hero Post Header */
+.post-hero {
+    position: relative;
+    padding: 6rem 0 4rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    overflow: hidden;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 2;
+}
+
+.hero-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+    width: 100px;
+    height: 100px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 2rem;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+}
+
+.post-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.author-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.avatar-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: block;
+}
+
+.author-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.post-date {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.post-stats {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Post Article */
+.post-article {
+    padding: 4rem 0;
+    background: #f8fafc;
+}
+
+.article-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.content-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.content-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.content-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #2d3748;
+    white-space: normal;
+}
+
+/* Enhanced Like Button */
+.post-actions {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.btn-like {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 50px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-like:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-like.liked {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-color: #667eea;
+}
+
+.like-icon {
+    transition: transform 0.3s ease;
+}
+
+.btn-like:hover .like-icon {
+    transform: scale(1.2);
+}
+
+.btn-like.liked .like-icon {
+    animation: heartBeat 0.6s ease;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+/* Login Prompt */
+.login-prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.prompt-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.prompt-text {
+    font-size: 1rem;
+    color: #64748b;
+}
+
+.prompt-text a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.prompt-text a:hover {
+    text-decoration: underline;
+}
+
+/* Comments Section */
+.comments-section {
+    padding: 4rem 0;
+    background: white;
+}
+
+.comments-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.comment-count {
+    font-size: 1.5rem;
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* Comment Form */
+.comment-form-card {
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.comment-input {
+    width: 100%;
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: none;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-end;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Comments List */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.comment-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.comment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+    margin-bottom: 1rem;
+}
+
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.comment-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-action:hover {
+    background: #f8fafc;
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-action.liked {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-color: #667eea;
+}
+
+/* Reply Form */
+.reply-form {
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    display: none;
+}
+
+.reply-input {
+    width: 100%;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    resize: none;
+    margin-bottom: 1rem;
+}
+
+.reply-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #64748b;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+    background: #cbd5e0;
+}
+
+/* Replies */
+.replies {
+    margin-top: 1.5rem;
+    padding-left: 2rem;
+    border-left: 3px solid #e2e8f0;
+}
+
+.reply-card {
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+}
+
+.reply-header {
+    margin-bottom: 1rem;
+}
+
+.reply-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.reply-date {
+    font-size: 0.85rem;
+    color: #718096;
+}
+
+.reply-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #2d3748;
+    margin-bottom: 1rem;
+}
+
+/* Post Actions Footer */
+.post-actions-footer {
+    padding: 2rem 0;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.actions-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn-action-edit,
+.btn-action-delete {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-action-edit {
+    background: #667eea;
+    color: white;
+    border: none;
+}
+
+.btn-action-edit:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-action-delete {
+    background: #e53e3e;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-action-delete:hover {
+    background: #c53030;
+    transform: translateY(-1px);
+}
+
+/* Sosyal Medya Paylaşım Butonları */
+.social-share-section {
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.share-title {
+    color: #374151;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.share-title i {
+    color: #667eea;
+}
+
+.social-share-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: white;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.share-facebook {
+    background: #1877f2;
+}
+
+.share-facebook:hover {
+    background: #166fe5;
+}
+
+.share-twitter {
+    background: #1da1f2;
+}
+
+.share-twitter:hover {
+    background: #1a91da;
+}
+
+.share-linkedin {
+    background: #0077b5;
+}
+
+.share-linkedin:hover {
+    background: #006097;
+}
+
+.share-whatsapp {
+    background: #25d366;
+}
+
+.share-whatsapp:hover {
+    background: #20ba5a;
+}
+
+.share-copy {
+    background: #6b7280;
+}
+
+.share-copy:hover {
+    background: #4b5563;
+}
+
+.share-btn i {
+    font-size: 1rem;
+}
+
+.share-btn span {
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .social-share-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .share-btn {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+    }
+}
+
+/* Alert Styles */
+.alert-modern {
+    border: none;
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #e53e3e, #c53030);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .post-hero {
+        padding: 4rem 0 3rem;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .content-card {
+        padding: 2rem;
+        margin: 0 1rem 2rem;
+    }
+    
+    .comments-wrapper {
+        margin: 0 1rem;
+    }
+    
+    .comment-form-card {
+        margin: 0 1rem 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .replies {
+        padding-left: 1rem;
+    }
+    
+    .actions-wrapper {
+        margin: 0 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .content-card {
+        padding: 1.5rem;
+    }
+    
+    .comment-card {
+        padding: 1.5rem;
+    }
+    
+    .btn-like {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+{% endblock %}

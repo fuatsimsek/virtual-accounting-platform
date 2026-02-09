@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Kayıt Ol - Sanal Muhasebecim{% endblock %}
+{% block meta_description %}Sanal Muhasebecim'e ücretsiz kayıt olun. Modern muhasebe hizmetlerine erişim için hesap oluşturun.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section hero-register">
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Hesap <span class="highlight">Oluşturun</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Modern muhasebe hizmetlerine erişim için ücretsiz hesap oluşturun
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Register Form Section -->
+<section class="register-section">
+    <div class="container">
+        <div class="register-container">
+            <div class="register-card">
+                <div class="register-header">
+                    <h2>Kayıt Ol</h2>
+                    <p>Hemen ücretsiz hesap oluşturun ve başlayın</p>
+                </div>
+                
+                <form method="POST" class="register-form">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.name.id }}">Ad Soyad</label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                {{ form.name(class="form-control", placeholder="Adınız ve soyadınız") }}
+                            </div>
+                            {% if form.name.errors %}
+                                <div class="error-message">
+                                    {% for error in form.name.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.phone.id }}">Telefon</label>
+                            <div class="input-group">
+                                <i class="fas fa-phone"></i>
+                                {{ form.phone(class="form-control", placeholder="+90 555 123 45 67") }}
+                            </div>
+                            {% if form.phone.errors %}
+                                <div class="error-message">
+                                    {% for error in form.phone.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="{{ form.email.id }}">E-posta Adresi</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            {{ form.email(class="form-control", placeholder="ornek@email.com") }}
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="error-message">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="{{ form.password.id }}">Şifre</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                {{ form.password(class="form-control", placeholder="En az 8 karakter") }}
+                            </div>
+                            <div class="policy-inline" style="margin-top:6px;font-size:12px;color:#64748b;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <span style="display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-shield-alt"></i> Şifre politikası:</span>
+                                <span style="background:#eef2ff;color:#4f46e5;padding:2px 8px;border-radius:999px;">8+ karakter</span>
+                                <span style="background:#ecfeff;color:#0e7490;padding:2px 8px;border-radius:999px;">A-Z</span>
+                                <span style="background:#f0fdf4;color:#15803d;padding:2px 8px;border-radius:999px;">a-z</span>
+                                <span style="background:#fff7ed;color:#c2410c;padding:2px 8px;border-radius:999px;">0-9</span>
+                                <span style="background:#f5f3ff;color:#6d28d9;padding:2px 8px;border-radius:999px;">Sembol</span>
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="error-message">
+                                    {% for error in form.password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.confirm_password.id }}">Şifre Tekrar</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                {{ form.confirm_password(class="form-control", placeholder="Şifrenizi tekrar girin") }}
+                            </div>
+                            {% if form.confirm_password.errors %}
+                                <div class="error-message">
+                                    {% for error in form.confirm_password.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- KALDIRILDI - Ek alanlar -->
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            {{ form.accept_terms() }}
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                <a href="{{ url_for('public.kvkk') }}" target="_blank">KVKK</a> ve 
+                                <a href="{{ url_for('public.terms') }}" target="_blank">Kullanım Şartları</a>'nı kabul ediyorum
+                            </span>
+                        </label>
+                        {% if form.accept_terms.errors %}
+                            <div class="error-message">
+                                {% for error in form.accept_terms.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-large btn-full">
+                        <i class="fas fa-user-plus"></i>
+                        Hesap Oluştur
+                    </button>
+                </form>
+                
+                <div class="register-divider">
+                    <span>veya</span>
+                </div>
+                
+                <div class="social-register">
+                    {% if google_oauth_enabled %}
+                    <a href="{{ url_for('account.login_google') }}" class="btn btn-social btn-google">
+                        <i class="fab fa-google"></i>
+                        Google ile Kayıt Ol
+                    </a>
+                    {% else %}
+                    <button class="btn btn-social btn-google" disabled title="Geçici olarak kullanılamıyor">
+                        <i class="fab fa-google"></i>
+                        Google ile Kayıt (devre dışı)
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div class="register-footer">
+                    <p>Zaten hesabınız var mı? <a href="{{ url_for('account.login') }}" class="link-primary">Giriş yapın</a></p>
+                </div>
+            </div>
+            
+            <div class="register-benefits">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h3>Ücretsiz Başlangıç</h3>
+                        <p>Ön görüşme tamamen ücretsiz</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h3>Hızlı Kurulum</h3>
+                        <p>2 dakikada hesabınızı oluşturun ve hemen başlayın</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h3>Hızlı Destek</h3>
+                        <p>Uzman ekibimiz her zaman yanınızda</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h3>Güvenli Platform</h3>
+                        <p>Güvenli veri koruması</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Kayıt Olduktan Sonra</h2>
+            <p class="section-subtitle">Neler yapabilirsiniz?</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Randevu Alın</h3>
+                <p>Uzman muhasebe danışmanlarımızla online görüşme planlayın.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h3>Vergi Takibi</h3>
+                <p>Vergi ödemelerinizi ve beyannamelerinizi kolayca takip edin.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Finansal Analiz</h3>
+                <p>İşletmenizin finansal performansını detaylı olarak analiz edin.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <h3>Destek Alın</h3>
+                <p>Muhasebe konularında uzman desteği alın ve sorularınızı sorun.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Hemen Başlayın</h2>
+            <p>Ücretsiz hesap oluşturun ve muhasebe hizmetlerinize erişin.</p>
+            <a href="#register" class="btn btn-primary btn-large">
+                <i class="fas fa-user-plus"></i>
+                Ücretsiz Kayıt Ol
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- KALDIRILDI - CSS stilleri -->
+
+{% endblock %}

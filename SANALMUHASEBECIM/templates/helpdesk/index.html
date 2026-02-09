@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Yardım Merkezi{% endblock %}
+{% block content %}
+
+<section class="hero-section hero-services">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Yardım <span class="highlight">Merkezi</span></h1>
+        <p class="hero-subtitle">Destek taleplerinizi buradan takip edin ve yeni ticket oluşturun</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-hero" href="{{ url_for('helpdesk.new_ticket') }}">
+            <i class="fas fa-plus"></i>
+            Yeni Ticket
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="services-grid-section">
+  <div class="container">
+    <div class="card">
+      {% set status_labels = {'new':'Yeni','open':'Açık','closed':'Tamamlandı'} %}
+      {% set priority_labels = {'low':'Düşük','normal':'Normal','high':'Yüksek','urgent':'Acil'} %}
+      <ul class="divide-y">
+        {% for t in tickets %}
+        <li class="py-3">
+          <a href="{{ url_for('helpdesk.ticket_detail', ticket_id=t.id) }}" class="flex justify-between items-center group">
+            <div>
+              <span class="btn-outline text-sm py-1 px-2 inline-flex items-center gap-2">
+                <i class="fas fa-ticket-alt text-xs"></i>
+                {{ t.subject }}
+              </span>
+              <div class="text-sm text-gray-500 mt-1">Durum: {{ status_labels.get(t.status, t.status) }} • Öncelik: {{ priority_labels.get(t.priority, t.priority) }}</div>
+            </div>
+            <div class="text-sm text-gray-500 flex items-center gap-2">
+              {% if unread_map and unread_map.get(t.id) %}
+              <span class="notif-badge">{{ unread_map.get(t.id) }}</span>
+              {% endif %}
+              <span class="group-hover:text-gray-700">{{ t.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+            </div>
+          </a>
+        </li>
+        {% else %}
+        <li>Henüz ticket yok.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

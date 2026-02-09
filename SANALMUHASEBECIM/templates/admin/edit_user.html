@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Kullanıcı Düzenle{% endblock %}
+{% block content %}
+<section class="section-padding">
+  <div class="container-custom max-w-2xl">
+    <div class="card">
+      <h1 class="text-2xl font-bold mb-6">Kullanıcı Düzenle</h1>
+      <form method="post" class="space-y-4">
+        {{ form.hidden_tag() }}
+        <div>
+          <label class="form-label">Ad</label>
+          {{ form.name(class_='form-input') }}
+        </div>
+        <div>
+          <label class="form-label">E-posta</label>
+          {{ form.email(class_='form-input') }}
+        </div>
+        <div class="flex items-center space-x-2">
+          {{ form.is_admin() }}<label class="text-sm">Admin</label>
+        </div>
+        <button class="btn-primary" type="submit">Kaydet</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

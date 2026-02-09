@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="{% block meta_description %}{% endblock %}" />
+    <meta name="author" content="Sanal Muhasebecim" />
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}" />
+    
+    <!-- Türkçe karakter desteği -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="tr" />
+    <meta name="language" content="Turkish" />
+    
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content="{% block og_title %}{{ title }} - Sanal Muhasebecim{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}{{ self.meta_description() }}{% endblock %}" />
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='img/og-image.jpg', _external=True) }}{% endblock %}" />
+    <meta property="og:url" content="{{ request.url }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    {% if title %}
+    <title>{{ title }} - Sanal Muhasebecim</title>
+    {% else %}
+    <title>Sanal Muhasebecim - Modern Muhasebe Çözümleri</title>
+    {% endif %}
+
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}" />
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Pro-like Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Core theme CSS -->
+    <link href="{{url_for('static',filename='styles.css')}}" rel="stylesheet" />
+    <link href="{{url_for('static',filename='enhanced-styles.css')}}" rel="stylesheet" />
+    
+    {% block head %}{% endblock %}
+    
+    <!-- Modern CSS Variables -->
+    <style>
+        :root {
+            --govbar-h: 48px;
+            --navbar-h: 72px;
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary-color: #f59e0b;
+            --accent-color: #10b981;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-dark: #111827;
+            
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            
+            --border-radius-sm: 0.375rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-2xl: 1.5rem;
+            
+            --transition-fast: 0.15s ease-in-out;
+            --transition-normal: 0.3s ease-in-out;
+            --transition-slow: 0.5s ease-in-out;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Selection */
+        ::selection {
+            background: var(--primary-light);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Kamu Hızlı Erişim Çubuğu -->
+    <div class="govbar fixed-top">
+        <div class="container govbar-wrap">
+            <div class="govbar-note"><span class="govbar-note-full">İhtiyacınıza yarayacak hızlı kamu bağlantıları</span><span class="govbar-note-short">Kamu bağlantıları</span></div>
+            <button class="govbar-nav govbar-prev" type="button" aria-label="Geri">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="govbar-inner" id="govbarLinks">
+            <a class="govlink" href="https://www.turkiye.gov.tr/" target="_blank" rel="noopener nofollow" title="e-Devlet Kapısı">
+                <i class="fas fa-landmark"></i>
+                <span>e-Devlet</span>
+            </a>
+            <a class="govlink" href="https://ivd.gib.gov.tr/" target="_blank" rel="noopener nofollow" title="GİB İnteraktif Vergi Dairesi">
+                <i class="fas fa-file-invoice"></i>
+                <span>GİB / İVD</span>
+            </a>
+            <a class="govlink" href="https://uyg.sgk.gov.tr/IsverenSistemi" target="_blank" rel="noopener nofollow" title="SGK İşveren">
+                <i class="fas fa-users-gear"></i>
+                <span>SGK İşveren</span>
+            </a>
+            <a class="govlink" href="https://mersis.gtb.gov.tr/" target="_blank" rel="noopener nofollow" title="MERSİS - Merkezi Sicil Kayıt Sistemi">
+                <i class="fas fa-building"></i>
+                <span>MERSİS</span>
+            </a>
+            <a class="govlink" href="https://www.kosgeb.gov.tr/site/tr/genel/destekler/3/destekler" target="_blank" rel="noopener nofollow" title="KOSGEB Destekleri">
+                <i class="fas fa-lightbulb"></i>
+                <span>KOSGEB</span>
+            </a>
+            <a class="govlink" href="https://esube.iskur.gov.tr/" target="_blank" rel="noopener nofollow" title="İŞKUR e-Şube">
+                <i class="fas fa-briefcase"></i>
+                <span>İŞKUR</span>
+            </a>
+            <a class="govlink" href="https://ekap.kik.gov.tr/" target="_blank" rel="noopener nofollow" title="EKAP Kamu İhale Platformu">
+                <i class="fas fa-gavel"></i>
+                <span>EKAP</span>
+            </a>
+            <a class="govlink" href="https://www.etebligat.gov.tr/" target="_blank" rel="noopener nofollow" title="UETS - Elektronik Tebligat">
+                <i class="fas fa-envelope"></i>
+                <span>UETS</span>
+            </a>
+            </div>
+            <button class="govbar-nav govbar-next" type="button" aria-label="İleri">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+    <!-- Modern Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('public.index') }}">
+                <div class="brand-logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="brand-text">Sanal<span class="text-primary">Muhasebe</span></span>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                {% if request.endpoint == 'admin.dashboard' %}
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link admin-link" href="{{ url_for('admin.dashboard') }}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link admin-link" href="{{ url_for('public.index') }}">
+                                <i class="fas fa-home"></i> Siteye Dön
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link admin-link" href="{{ url_for('account.logout') }}">
+                                <i class="fas fa-sign-out-alt"></i> Çıkış
+                            </a>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'public.index' %}active{% endif %}" href="{{ url_for('public.index') }}">
+                                <i class="fas fa-home"></i> Ana Sayfa
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'public.services' %}active{% endif %}" href="{{ url_for('public.services') }}">
+                                <i class="fas fa-briefcase"></i> Hizmetler
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'blog.index' %}active{% endif %}" href="{{ url_for('blog.index') }}">
+                                <i class="fas fa-blog"></i> Blog
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'booking.index' %}active{% endif %}" href="{{ url_for('booking.index') }}">
+                                <i class="fas fa-handshake"></i> Danışmanlık
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'public.about' %}active{% endif %}" href="{{ url_for('public.about') }}">
+                                <i class="fas fa-info-circle"></i> Hakkımızda
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'public.contact' %}active{% endif %}" href="{{ url_for('public.contact') }}">
+                                <i class="fas fa-envelope"></i> İletişim
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.is_admin %}
+                                <li class="nav-item">
+                                    <a class="nav-link admin-badge" href="{{ url_for('admin.dashboard') }}">
+                                        <i class="fas fa-user-shield"></i> Admin
+                                        <span id="adminTotalBadge" class="notif-badge" style="display: none;">0</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle user-menu" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                                    <div class="user-avatar">
+                                        {% if current_user.profile_photo %}
+                                            <img src="{{ current_user.profile_photo }}" alt="{{ current_user.name }}" class="user-photo">
+                                        {% else %}
+                                            <i class="fas fa-user"></i>
+                                        {% endif %}
+                                    </div>
+                                    <span class="user-name">{{ current_user.name }}</span>
+                                    {% if session.get('_remember', False) %}
+                                    <span class="remember-badge" title="Beni Hatırla aktif - 30 gün otomatik giriş">
+                                        <i class="fas fa-clock" style="color: #10b981; font-size: 12px;"></i>
+                                    </span>
+                                    {% endif %}
+                                    <span class="notif-badge" style="display: none;" id="headerNotificationBadge"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end modern-dropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('account.profile') }}">
+                                            <i class="fas fa-user"></i> Profil
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('helpdesk.index') }}">
+                                            <i class="fas fa-headset"></i> Yardım
+                                            <span class="notif-badge small" style="display: none;" id="dropdownNotificationBadge"></span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('booking.my_appointments') }}">
+                                            <i class="fas fa-calendar"></i> Randevularım
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ url_for('account.logout') }}">
+                                            <i class="fas fa-sign-out-alt"></i> Çıkış
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('account.login') }}">
+                                    <i class="fas fa-sign-in-alt"></i> Giriş
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-modern" href="{{ url_for('account.register') }}">
+                                    <i class="fas fa-user-plus"></i> Kayıt Ol
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Modern Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+                {% if not (request.endpoint and 'helpdesk.ticket_detail' in request.endpoint and category == 'success') %}
+                <div class="alert alert-modern alert-{{ category }} alert-dismissible fade show{% if category == 'kvkk_terms' %} kvkk-terms-toast{% endif %}" role="alert">
+                    <div class="alert-content">
+                        <i class="alert-icon fas fa-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-triangle{% elif category == 'warning' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        <span class="alert-message">{{ message | safe }}</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content" style="padding-top: calc(var(--govbar-h) + var(--navbar-h));">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Modern Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="brand-text">Sanal<span class="text-primary">Muhasebe</span></span>
+                    </div>
+                    <p class="footer-description">
+                        Modern teknoloji ile muhasebe çözümleri. İşletmenizi büyütmek için yanınızdayız.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h5>Hizmetler</h5>
+                        <ul>
+                            {% if footer_services %}
+                                {% for s in footer_services %}
+                                <li><a href="{{ url_for('public.service_detail', slug=s.slug) }}">{{ s.name }}</a></li>
+                                {% endfor %}
+                                <li><a href="{{ url_for('public.services') }}">Tümünü Gör</a></li>
+                            {% else %}
+                                <li><a href="{{ url_for('public.services') }}">Hizmetlerimiz</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h5>Şirket</h5>
+                        <ul>
+                            <li><a href="{{ url_for('public.about') }}">Hakkımızda</a></li>
+                            <li><a href="{{ url_for('public.contact') }}">İletişim</a></li>
+                            <li><a href="{{ url_for('blog.index') }}">Blog</a></li>
+                            <li><a href="{{ url_for('helpdesk.index') }}">Yardım</a></li>
+                            <li><a href="{{ url_for('booking.index') }}">Randevu Al</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-section">
+                        <h5>Yasal</h5>
+                        <ul>
+                                                         <li><a href="{{ url_for('public.kvkk') }}">KVKK</a></li>
+                            <li><a href="{{ url_for('public.terms') }}" onclick="window.location.href='{{ url_for('public.terms') }}'; return false;">Kullanım Şartları</a></li>
+                            <li><a href="{{ url_for('public.privacy') }}">Gizlilik Politikası</a></li>
+                            <li><a href="{{ url_for('public.cerez') }}">Çerez Politikası</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-section">
+                        <h5>Bülten</h5>
+                        <form method="post" action="{{ url_for('public.subscribe') }}" class="newsletter-form" style="display:flex;flex-direction:column;gap:8px;align-items:stretch;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="email" name="email" placeholder="E-posta adresiniz" required style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:#fff;">
+                            <button class="btn-modern" type="submit" style="padding:10px 14px;white-space:nowrap;">
+                                <i class="fas fa-bell"></i> Abone Ol
+                            </button>
+                        </form>
+                        <p style="color:#9ca3af;font-size:12px;margin-top:8px;">Yeni yazılar yayınlandığında e-posta alırsınız.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-info">
+                    <p>&copy; 2025 Sanal Muhasebecim. Tüm hakları saklıdır.</p>
+                    <p>Modern muhasebe çözümleri ile işletmenizi büyütün.</p>
+                </div>
+                <div class="footer-badges">
+                    <span class="badge badge-modern">
+                        <i class="fas fa-shield-alt"></i> Güvenli
+                    </span>
+                    <span class="badge badge-modern">
+                        <i class="fas fa-clock"></i> Hızlı Destek
+                    </span>
+                    <span class="badge badge-modern">
+                        <i class="fas fa-certificate"></i> Sertifikalı
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Newsletter Modal -->
+    <div id="newsletterModal" class="nl-modal" aria-hidden="true" style="display:none;">
+        <div class="nl-backdrop" data-close="true"></div>
+        <div class="nl-dialog" role="dialog" aria-modal="true" aria-labelledby="nlTitle">
+            <button class="nl-close" type="button" aria-label="Kapat" data-close="true">×</button>
+            <div class="nl-body">
+                <h3 id="nlTitle" class="nl-title">Bültenimize abone olun</h3>
+                <p class="nl-sub">Güncel içerikleri ve önemli duyuruları e-posta kutunuza gönderelim.</p>
+                <form method="post" action="{{ url_for('public.subscribe') }}" class="nl-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input class="nl-input" type="email" name="email" placeholder="E-posta adresiniz" required>
+                    <button class="nl-btn" type="submit">Abone Ol</button>
+                </form>
+                <label class="nl-later"><input type="checkbox" id="nlHideWeek"> Bir hafta boyunca gösterme</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Modals -->
+    <div class="modal fade" id="kvkkModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modern-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-shield-alt"></i> KVKK Aydınlatma Metni
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="kvkk-content">
+                        <h6>Kişisel Verilerin Korunması Hakkında Aydınlatma Metni</h6>
+                        <p>Sanal Muhasebecim olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") kapsamında, kişisel verilerinizin işlenmesine ilişkin olarak sizi bilgilendirmek isteriz.</p>
+                        
+                        <div class="kvkk-section">
+                            <strong>1. Veri Sorumlusu:</strong> Sanal Muhasebecim
+                        </div>
+                        <div class="kvkk-section">
+                            <strong>2. İşlenen Kişisel Veriler:</strong> Ad, soyad, e-posta, randevu bilgileri vb.
+                        </div>
+                        <div class="kvkk-section">
+                            <strong>3. İşleme Amaçları:</strong> Hizmet sunumu, iletişim, yasal yükümlülüklerin yerine getirilmesi.
+                        </div>
+                        <div class="kvkk-section">
+                            <strong>4. Aktarım:</strong> Yasal zorunluluklar haricinde üçüncü kişilerle paylaşılmaz.
+                        </div>
+                        <div class="kvkk-section">
+                            <strong>5. Haklarınız:</strong> KVKK'nın 11. maddesi kapsamında dilediğiniz zaman başvurarak haklarınızı kullanabilirsiniz.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-modern" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="kullanimModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content modern-modal">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-file-contract"></i> Kullanım Sözleşmesi
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="terms-content">
+                        <h6>Kullanım Koşulları</h6>
+                        <p>Bu siteyi kullanarak aşağıdaki şartları kabul etmiş sayılırsınız:</p>
+                        
+                        <div class="terms-section">
+                            <strong>1. Hizmet:</strong> Sanal Muhasebecim, kullanıcılarına danışmanlık ve bilgi hizmeti sunar.
+                        </div>
+                        <div class="terms-section">
+                            <strong>2. Sorumluluk:</strong> Sunulan bilgiler genel bilgilendirme amaçlıdır. Karar almadan önce mutlaka bir uzmana danışınız.
+                        </div>
+                        <div class="terms-section">
+                            <strong>3. Fikri Mülkiyet:</strong> Sitedeki içeriklerin tüm hakları saklıdır. İzinsiz kopyalanamaz.
+                        </div>
+                        <div class="terms-section">
+                            <strong>4. Değişiklik:</strong> Sanal Muhasebecim, kullanım koşullarını önceden haber vermeksizin değiştirme hakkını saklı tutar.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-modern" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modern Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{url_for('static',filename='scripts.js')}}"></script>
+
+    <!-- Modern Styles -->
+    <style>
+        /* Modern Navigation Styles */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 0;
+            padding: 0; /* toplam yükseklik tam olarak var(--navbar-h) olsun */
+            transition: var(--transition-normal);
+            position: fixed;
+            top: var(--govbar-h) !important; /* govbar'ın altı */
+            width: 100%;
+            z-index: 1030;
+            height: var(--navbar-h) !important; /* gerçek render yüksekliği sabitle */
+            will-change: transform;
+            transition: transform .25s ease, background .25s ease;
+            transform: translateY(0);
+        }
+        /* Force fixed behavior even if external CSS tries to make it sticky */
+        .navbar.fixed-top { position: fixed !important; top: var(--govbar-h) !important; }
+        /* İç container da sabit hizada olsun */
+        .navbar > .container { height: 100%; display: flex; align-items: center; }
+        
+        .navbar.scrolled { background: transparent; }
+
+        /* Navbar sizing adjustments for smaller screens to reduce top gap */
+        @media (max-width: 768px){
+            :root{ --navbar-h: 60px; }
+            .navbar{ padding: 0; }
+        }
+        @media (max-width: 576px){
+            :root{ --navbar-h: 56px; }
+            .navbar{ padding: 0; }
+        }
+
+        /* Gov quick access bar */
+        .govbar {
+            background: #0d6efd;
+            color: #fff;
+            border-bottom: 0 !important; /* alt çizgi kaldır: 1px boşluk oluşmasın */
+            height: var(--govbar-h);
+            display: flex;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1041; /* navbar'dan yukarıda */
+            margin: 0;
+            will-change: transform;
+            transform: translateZ(0);
+            transition: transform .25s ease;
+            box-shadow: none !important;
+        }
+        .govbar-inner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            justify-content: flex-start;
+            white-space: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+        }
+        .govbar-inner::-webkit-scrollbar { display: none; }
+        .govbar-wrap{ display:flex; align-items:center; gap:8px; position: relative; overflow: hidden; }
+        /* Edge fade masks for a softer scroll feel */
+        .govbar-wrap::before, .govbar-wrap::after{
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 36px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .govbar-wrap::before{ left: 0; background: linear-gradient(90deg, rgba(13,110,253,1) 0%, rgba(13,110,253,0) 100%); }
+        .govbar-wrap::after{ right: 0; background: linear-gradient(270deg, rgba(13,110,253,1) 0%, rgba(13,110,253,0) 100%); }
+        .govbar-note{ color:#fff; font-weight:600; font-size:.9rem; opacity:.95; margin-right:8px; white-space:nowrap; position: relative; z-index: 2; padding-left: 4px; }
+        .govbar-note-short{ display:none; }
+        @media (max-width: 640px){
+            .govbar-note-full{ display:none; }
+            .govbar-note-short{ display:inline; }
+        }
+        /* Mobile aesthetics */
+        @media (max-width: 768px){
+            .govbar-nav{ display:none !important; }
+            .govbar-wrap::before, .govbar-wrap::after{ width: 18px; }
+            .govbar-inner{ gap: 10px; padding: 0 2px; scroll-snap-type: x mandatory; }
+            .govlink{ padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.12); box-shadow: 0 3px 8px rgba(0,0,0,0.16); font-size: 13px; }
+            .govlink i{ font-size: 15px; }
+            .govbar-note{ font-weight: 600; opacity: .95; }
+            /* Alt ayırıcı çizgi */
+            .govbar::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:1px; background: rgba(255,255,255,0.35); }
+        }
+        .govbar-nav{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.15);
+            color:#fff;
+            cursor: pointer;
+            transition: background .2s ease, transform .15s ease;
+        }
+        .govbar-nav:hover{ background: rgba(255,255,255,0.25); transform: translateY(-1px); }
+        .govbar-nav:disabled{ opacity:.5; cursor: default; transform:none; }
+        .govlink {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff !important;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 6px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.06);
+            transition: transform .15s ease, background .2s ease, box-shadow .2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+        .govlink i { font-size: 14px; }
+        .govlink:hover, .govlink:focus { 
+            background: rgba(255,255,255,0.22);
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+            text-decoration: none;
+        }
+        .govlink:focus-visible { outline: 2px solid rgba(255,255,255,0.8); outline-offset: 2px; }
+        
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .brand-logo i {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        
+        .brand-text {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Footer brand text için özel stil */
+        .footer-modern .brand-text {
+            color: white;
+        }
+        
+        .nav-link {
+            color: var(--text-primary) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem !important;
+            border-radius: var(--border-radius-lg);
+            transition: var(--transition-normal);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            background: var(--gradient-primary);
+            color: white !important;
+        }
+        
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .btn-modern {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-lg);
+            font-weight: 600;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem !important;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: var(--border-radius-xl);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .modern-dropdown {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 0.5rem;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius-md);
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .dropdown-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .admin-link {
+            background: var(--gradient-secondary);
+            color: white !important;
+            margin: 0 0.25rem;
+        }
+        
+        .admin-badge {
+            background: var(--gradient-success);
+            color: white !important;
+            margin: 0 0.25rem;
+        }
+        
+        /* Modern Flash Messages */
+        .flash-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+        }
+        
+        .alert-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        /* KVKK/Terms küçük sağ pencere stili */
+        .kvkk-terms-toast{
+            position: relative;
+            border-left-color: var(--info-color);
+            min-width: 300px;
+        }
+        
+        .alert-success {
+            border-left-color: var(--success-color);
+        }
+        
+        .alert-danger {
+            border-left-color: var(--danger-color);
+        }
+        
+        .alert-warning {
+            border-left-color: var(--warning-color);
+        }
+        
+        .alert-info {
+            border-left-color: var(--info-color);
+        }
+        
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+        
+        .alert-message {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: var(--transition-fast);
+        }
+        
+        .btn-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            /* 1px azaltarak seam/çizgi oluşumunu engelle */
+            padding-top: calc(var(--govbar-h) + var(--navbar-h) - 1px) !important;
+            min-height: auto;
+            margin-top: 0 !important;
+            border-top: 0 !important;
+        }
+        /* İlk içerik bloğunun tepesindeki varsayılan heading/section boşluklarını sıfırla */
+        .main-content > *:first-child { margin-top: 0 !important; padding-top: 0 !important; border-top: 0 !important; }
+        /* Hero section için de boşluk olmasın */
+        .hero-section{ margin-top: 0 !important; padding-top: 0 !important; border-top: 0 !important; }
+        .hero-section .hero-background, .hero-section .hero-overlay { margin-top: 0 !important; padding-top: 0 !important; }
+
+        /* Auto-hide header (govbar + navbar) when scrolling down */
+        body.hide-header .govbar { transform: translateY(calc(-1 * var(--govbar-h))); }
+        body.hide-header .navbar { transform: translateY(calc(-1 * (var(--govbar-h) + var(--navbar-h)))) !important; }
+        body.hide-header .main-content { padding-top: 0 !important; }
+        
+        /* Modern Footer */
+        .footer-modern {
+            background: var(--bg-dark);
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-brand {
+            max-width: 300px;
+        }
+        
+        .footer-description {
+            color: #9ca3af;
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: var(--transition-normal);
+        }
+        
+        .social-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        
+        .footer-section h5 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-section ul li a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        
+        .footer-section ul li a:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-info p {
+            color: #9ca3af;
+            margin: 0;
+        }
+        
+        .footer-badges {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .badge-modern {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-lg);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Modern Modals */
+        .modern-modal {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-2xl);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .kvkk-content, .terms-content {
+            line-height: 1.6;
+        }
+        
+        .kvkk-section, .terms-section {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+        }
+        
+        /* Animations */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                border-radius: var(--border-radius-lg);
+                padding: 1rem;
+                margin-top: 1rem;
+                box-shadow: var(--shadow-lg);
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .footer-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .footer-links {
+                grid-template-columns: 1fr;
+            }
+            
+            .flash-container {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+            
+            .remember-badge {
+                margin-left: 0.5rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: rgba(16, 185, 129, 0.1);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+            }
+        }
+    </style>
+
+    <!-- Modern JavaScript -->
+    <script>
+        // Govbar otomatik sola doğru akış (sonsuz marquee) + manuel yön tuşları (tıklanınca durur)
+        (function(){
+            const inner = document.querySelector('.govbar-inner');
+            const prev = document.querySelector('.govbar-prev');
+            const next = document.querySelector('.govbar-next');
+            if(!inner) return;
+            inner.style.scrollBehavior = 'auto';
+            const isMobile = matchMedia('(max-width: 768px)').matches;
+            const SPEED = isMobile ? 0.41 : 0.30; // hafif hız artışı
+            // İçeriği kopyalayarak kesintisiz akış oluştur
+            const originals = Array.from(inner.children);
+            // Ölçüm için bir kez layout alalım
+            const gap = 14; // CSS gap değeri
+            let baseWidth = 0;
+            originals.forEach((el, i) => { baseWidth += el.getBoundingClientRect().width; if(i < originals.length-1) baseWidth += gap; });
+            // Görünür alandan da fazla olacak şekilde çoğalt
+            while(inner.scrollWidth < inner.clientWidth + baseWidth + 10){
+                originals.forEach(el => inner.appendChild(el.cloneNode(true)));
+            }
+            // Sola akış için başlangıçta sona konumlan
+            inner.scrollLeft = baseWidth;
+            // Modüler kaydırma (hem rAF hem interval ile sağlamlaştırıldı)
+            let paused = false;
+            let carry = 0; // subpixel birikimi (yuvarlamadan kaynaklı durmayı engeller)
+            inner.addEventListener('mouseenter', () => { paused = true; });
+            inner.addEventListener('mouseleave', () => { paused = false; });
+            // Tek bir buton kadar kaydır
+            const itemEl = inner.querySelector('.govlink');
+            const itemGap = 14; // CSS gap
+            const itemW = itemEl ? Math.ceil(itemEl.getBoundingClientRect().width + itemGap) : Math.ceil(inner.clientWidth * 0.25);
+            function manualScroll(delta){
+                paused = true; // manuel kullanımda durdur
+                carry = 0;
+                let next = inner.scrollLeft + delta;
+                if(next <= 0) next += baseWidth;
+                if(next >= baseWidth) next -= baseWidth;
+                inner.scrollLeft = next;
+                // 1.5sn sonra tekrar otomatik devam etsin
+                clearTimeout(manualScroll._t);
+                manualScroll._t = setTimeout(()=> { paused = false; }, 1500);
+            }
+            if(prev) prev.addEventListener('click', ()=> manualScroll(-itemW));
+            if(next) next.addEventListener('click', ()=> manualScroll(itemW));
+            function step(){
+                if(paused || inner.scrollWidth <= inner.clientWidth) return; // taşma yoksa/pausede animasyon yok
+                carry += SPEED;
+                if(carry < 1) return; // tam piksel birikene kadar bekle
+                const shift = Math.floor(carry);
+                carry -= shift;
+                let next = inner.scrollLeft - shift;
+                if(next <= 0) next += baseWidth;
+                inner.scrollLeft = next;
+            }
+            function raf(){ step(); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+        })();
+        
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Auto-hide alerts (genel: 5sn)
+        document.querySelectorAll('.alert-modern').forEach(alert => {
+            const isKvkk = alert.classList.contains('kvkk-terms-toast');
+            const timeout = isKvkk ? 10000 : 5000; // KVKK: 10sn
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.style.transition = 'all 0.3s ease';
+                    alert.style.transform = 'translateX(100%)';
+                    alert.style.opacity = '0';
+                    setTimeout(() => { if (alert.parentNode) { alert.remove(); } }, 300);
+                }
+            }, timeout);
+        });
+        
+        // Modern loading animation
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+        });
+
+        // Hide header on scroll down, show on scroll up (govbar + navbar together)
+        (function(){
+            let lastY = window.pageYOffset || document.documentElement.scrollTop || 0;
+            let ticking = false;
+            function onScroll(){
+                const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+                const goingDown = y > lastY + 4;   // küçük titreşimleri filtrele
+                const goingUp   = y < lastY - 4;
+                if(goingDown){ document.body.classList.add('hide-header'); }
+                else if(goingUp){ document.body.classList.remove('hide-header'); }
+                lastY = y;
+                ticking = false;
+            }
+            window.addEventListener('scroll', function(){
+                if(!ticking){
+                    window.requestAnimationFrame(onScroll);
+                    ticking = true;
+                }
+            }, { passive: true });
+        })();
+
+        // Global Helpdesk unread badge updater
+        (function(){
+            const isAuth = {{ 'true' if current_user.is_authenticated else 'false' }};
+            if(!isAuth) return;
+            async function fetchUnread(){
+                try{
+                    const res = await fetch("{{ url_for('helpdesk.unread_count') }}", { cache: 'no-store' });
+                    if(!res.ok) return null;
+                    const data = await res.json();
+                    return (data && typeof data.count === 'number') ? data.count : 0;
+                }catch(e){ return null; }
+            }
+            function setBadge(count){
+                // header badge near user name
+                let badge = document.getElementById('headerNotificationBadge');
+                if(count && count > 0){
+                    if(badge){
+                        badge.textContent = count;
+                        badge.style.display = 'inline-flex';
+                    }
+                } else if(badge){
+                    badge.style.display = 'none';
+                }
+                // dropdown helpdesk item badge
+                let small = document.getElementById('dropdownNotificationBadge');
+                if(count && count > 0){
+                    if(small){
+                        small.textContent = count;
+                        small.style.display = 'inline-flex';
+                    }
+                } else if(small){
+                    small.style.display = 'none';
+                }
+            }
+            async function refresh(){
+                const c = await fetchUnread();
+                if(c !== null){ setBadge(c); }
+            }
+            // expose for pages to call after actions
+            window.refreshHelpdeskUnread = refresh;
+            // initial and interval
+            refresh();
+            setInterval(refresh, 15000);
+            
+            // Add a small delay to prevent flash on page load
+            setTimeout(refresh, 100);
+        })();
+    </script>
+</body>
+<style>
+    .nl-modal{position:fixed;inset:0;z-index:2000}
+    .nl-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+    .nl-dialog{position:relative;max-width:520px;margin:8vh auto;background:#fff;border-radius:16px;box-shadow:var(--shadow-2xl);overflow:hidden}
+    .nl-close{position:absolute;right:10px;top:8px;border:none;background:transparent;font-size:24px;line-height:1;cursor:pointer;color:#475569}
+    .nl-body{padding:28px}
+    .nl-title{margin:0 0 6px 0;font-size:1.35rem;color:#111827}
+    .nl-sub{margin:0 0 16px 0;color:#6b7280}
+    .nl-form{display:flex;gap:8px}
+    .nl-input{flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:.95rem}
+    .nl-input:focus{outline:none;border-color:var(--primary-color);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+    .nl-btn{background:var(--primary-color);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:600;cursor:pointer}
+    .nl-btn:hover{background:var(--primary-dark)}
+    .nl-later{display:inline-flex;align-items:center;gap:8px;margin-top:12px;color:#6b7280;font-size:.9rem}
+    @media (max-width:640px){.nl-dialog{margin:12vh 12px}.nl-form{flex-direction:column}}
+</style>
+ 
+<script>
+(function(){
+    try{
+        var MODAL_ID='newsletterModal';
+        var KEY_HIDE_UNTIL='nl_hide_until';
+        var KEY_SUBSCRIBED='nl_subscribed';
+        var shown = false;
+        function now(){ return Date.now(); }
+        function sevenDays(){ return 7*24*60*60*1000; }
+        function shouldShow(){
+            if(localStorage.getItem(KEY_SUBSCRIBED)==='1') return false;
+            var hideUntil = parseInt(localStorage.getItem(KEY_HIDE_UNTIL)||'0',10);
+            return !hideUntil || now()>hideUntil;
+        }
+        function open(){ if(shown) return; var el=document.getElementById(MODAL_ID); if(!el) return; el.style.display='block'; el.setAttribute('aria-hidden','false'); shown=true; }
+        function close(){ var el=document.getElementById(MODAL_ID); if(!el) return; el.style.display='none'; el.setAttribute('aria-hidden','true'); }
+        window.addEventListener('DOMContentLoaded', function(){
+            var modal = document.getElementById(MODAL_ID);
+            if(!modal) return;
+            modal.addEventListener('click', function(e){
+                if(e.target && e.target.getAttribute('data-close')==='true'){
+                    close();
+                    var cb=document.getElementById('nlHideWeek');
+                    var delay = (cb && cb.checked) ? sevenDays() : (60*60*1000);
+                    try { localStorage.setItem(KEY_HIDE_UNTIL, String(now()+delay)); } catch(_){}
+                }
+            });
+            var form = modal.querySelector('form');
+            if(form){ form.addEventListener('submit', function(){ try{ localStorage.setItem(KEY_SUBSCRIBED,'1'); }catch(_){} }); }
+            setTimeout(function(){ if(shouldShow()) open(); }, 60000);
+        });
+    }catch(e){}
+})();
+</script>
+ 
+</html>

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Aboneler{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+  <div class="container">
+    <div class="admin-header">
+      <h1>E-posta Aboneleri</h1>
+      <div class="admin-actions">
+        <form method="get" action="{{ url_for('admin.subscribers') }}" class="flex gap-2">
+          <input name="q" value="{{ q or '' }}" class="admin-input" placeholder="E-posta ara" />
+          <select name="status" class="admin-input">
+            <option value="">Tümü</option>
+            <option value="active" {% if status=='active' %}selected{% endif %}>Aktif</option>
+            <option value="inactive" {% if status=='inactive' %}selected{% endif %}>Pasif</option>
+          </select>
+          <button class="btn btn-hero-modern" type="submit">Filtrele</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Yeni Abone Ekleme Formu -->
+    <div class="admin-card card mb-4">
+      <div class="card-header">
+        <h3><i class="fas fa-plus"></i> Yeni Abone Ekle</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" action="{{ url_for('admin.add_subscriber') }}" class="flex gap-3 items-end">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group flex-1">
+            <label class="form-label">E-posta Adresi</label>
+            <input type="email" name="email" class="admin-input" placeholder="ornek@email.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Durum</label>
+            <select name="is_active" class="admin-input">
+              <option value="true">Aktif</option>
+              <option value="false">Pasif</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-hero-modern">
+            <i class="fas fa-plus"></i> Abone Ekle
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="admin-table card">
+      <table class="table-modern">
+        <thead>
+          <tr><th>E-posta</th><th>Durum</th><th>Oluşturma</th><th>Son Bildirim</th><th>İşlem</th></tr>
+        </thead>
+        <tbody>
+          {% for s in subs.items %}
+          <tr>
+            <td>{{ s.email }}</td>
+            <td>
+              {% if s.is_active %}
+                <span class="badge badge-success">Aktif</span>
+              {% else %}
+                <span class="badge badge-danger">Pasif</span>
+              {% endif %}
+            </td>
+            <td>{{ s.created_at.strftime('%d.%m.%Y %H:%M') if s.created_at else '-' }}</td>
+            <td>{{ s.last_notified_at.strftime('%d.%m.%Y %H:%M') if s.last_notified_at else '-' }}</td>
+            <td class="table-actions">
+              <form method="post" action="{{ url_for('admin.toggle_subscriber', sub_id=s.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% if s.is_active %}
+                  <button class="btn btn-sm btn-outline-modern" onclick="return confirm('Abonelik pasifleştirilsin mi?')">Pasifleştir</button>
+                {% else %}
+                  <button class="btn btn-sm btn-hero-modern">Aktifleştir</button>
+                {% endif %}
+              </form>
+              <form method="post" action="{{ url_for('admin.delete_subscriber', sub_id=s.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-sm btn-danger" onclick="return confirm('Abone silinsin mi?')">Sil</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="admin-pagination">
+      {% if subs.has_prev %}<a class="btn btn-outline-modern" href="{{ url_for('admin.subscribers', page=subs.prev_num, q=q, status=status) }}">Önceki</a>{% else %}<span></span>{% endif %}
+      {% if subs.has_next %}<a class="btn btn-hero-modern" href="{{ url_for('admin.subscribers', page=subs.next_num, q=q, status=status) }}">Sonraki</a>{% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+.admin-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .flex {
+    flex-direction: column;
+  }
+  
+  .items-end {
+    align-items: stretch;
+  }
+}
+</style>
+{% endblock %}
+
+

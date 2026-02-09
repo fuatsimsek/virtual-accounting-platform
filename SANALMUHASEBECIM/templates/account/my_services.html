@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+
+{% block title %}Hizmetlerim{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1><i class="fas fa-briefcase"></i> Hizmetlerim</h1>
+                <p class="text-muted">Tüm hizmet talepleriniz ve aktif hizmetleriniz</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aktif Hizmetler -->
+    {% if customer_services %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-check-circle text-success"></i> Aktif Hizmetler</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for service in customer_services %}
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('public.service_detail', slug=service.service.slug) }}" class="service-card d-block text-decoration-none">
+                                <div class="service-card-header">
+                                    <h5 class="mb-0 text-dark">{{ service.service_name }}</h5>
+                                    <span class="badge badge-success">Aktif</span>
+                                </div>
+                                <div class="service-card-body">
+                                    <p><strong>Başlangıç:</strong> {{ service.start_date.strftime('%d.%m.%Y') }}</p>
+                                    {% if service.end_date %}
+                                    <p><strong>Bitiş:</strong> {{ service.end_date.strftime('%d.%m.%Y') }}</p>
+                                    {% endif %}
+                                    {% if service.monthly_fee %}
+                                    <p><strong>Aylık Ücret:</strong> {{ "%.2f"|format(service.monthly_fee) }} ₺</p>
+                                    {% endif %}
+                                    {% if service.one_time_fee %}
+                                    <p><strong>Tek Seferlik:</strong> {{ "%.2f"|format(service.one_time_fee) }} ₺</p>
+                                    {% endif %}
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <span class="text-primary font-weight-semibold">İncele <i class="fas fa-chevron-right"></i></span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Hizmet Talepleri -->
+    {% if service_requests %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock text-warning"></i> Hizmet Talepleri</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hizmet</th>
+                                    <th>Tarih</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for request in service_requests %}
+                                {% set appt = request.appointment %}
+                                {% set appt_cancelled = (appt and appt.status == 'cancelled') %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ request.service.name }}</strong>
+                                        {% if request.additional_details %}
+                                        <br><small class="text-muted">{{ request.additional_details[:100] }}...</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ request.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                                    <td>
+                                        {% if request.status == 'pending' %}
+                                        <span class="badge badge-warning">Beklemede</span>
+                                        {% elif request.status == 'approved' %}
+                                        <span class="badge badge-info">Onaylandı</span>
+                                        {% elif request.status == 'payment_confirmed' %}
+                                        <span class="badge badge-primary">Ödeme Alındı</span>
+                                        {% elif request.status == 'completed' %}
+                                        <span class="badge badge-success">Tamamlandı</span>
+                                        {% elif request.status == 'rejected' %}
+                                        <span class="badge badge-danger">Reddedildi</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">{{ request.status }}</span>
+                                        {% endif %}
+                                        {% if appt_cancelled %}
+                                        <span class="badge badge-danger ml-1">İptal Edildi</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('account.service_request_detail', request_id=request.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Detay
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lead'ler -->
+    {% if leads %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users text-info"></i> Hizmet Durumları</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for lead in leads %}
+                        {% set sr = lead.service_request %}
+                        {% set appt2 = sr.appointment if sr else None %}
+                        {% set appt2_cancelled = (appt2 and appt2.status == 'cancelled') %}
+                        <div class="col-md-6 mb-3">
+                            <div class="lead-card">
+                                <div class="lead-card-header">
+                                    <h5>{{ lead.service.name }}</h5>
+                                    {% if appt2_cancelled %}
+                                    <span class="badge badge-danger">❌ İptal Edildi</span>
+                                    {% else %}
+                                    <span class="badge {% if lead.status == 'pending' %}badge-warning{% elif lead.status == 'payment_pending' %}badge-info{% elif lead.status == 'paid' %}badge-success{% elif lead.status == 'completed' %}badge-primary{% elif lead.status == 'cancelled' %}badge-danger{% else %}badge-secondary{% endif %}">
+                                        {% if lead.status == 'pending' %}⏳ Bekleniyor{% elif lead.status == 'payment_pending' %}💳 Ödeme Bekleniyor{% elif lead.status == 'paid' %}✅ Ödendi{% elif lead.status == 'completed' %}🎉 Tamamlandı{% elif lead.status == 'cancelled' %}❌ İptal{% else %}{{ lead.status }}{% endif %}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="lead-card-body">
+                                    <div class="mb-2">
+                                        <span class="badge {% if 'one_time' in lead.lead_type %}badge-info{% elif 'monthly' in lead.lead_type %}badge-success{% else %}badge-secondary{% endif %}">
+                                            {% if lead.lead_type == 'one_time' %}🔵 Tek Hizmet{% elif lead.lead_type == 'monthly' %}🟢 Aylık Müşteri{% elif lead.lead_type == 'one_time_meeting_pending' %}🟠 Tek Hizmet Görüşme Bekleniyor{% elif lead.lead_type == 'monthly_meeting_pending' %}🟠 Aylık Görüşme Bekleniyor{% elif lead.lead_type == 'one_time_payment_pending' %}🔵 Tek Hizmet Ödeme Bekleniyor{% elif lead.lead_type == 'monthly_payment_pending' %}🟢 Aylık Ödeme Bekleniyor{% else %}⚪ Bekleniyor{% endif %}
+                                        </span>
+                                    </div>
+                                    <p><strong>Oluşturulma:</strong> {{ lead.created_at.strftime('%d.%m.%Y') }}</p>
+                                    
+                                    {% if lead.lead_type == 'one_time_payment_pending' and lead.one_time_amount %}
+                                    <p><strong>Ödeme Tutarı:</strong> {{ "%.2f"|format(lead.one_time_amount) }} ₺</p>
+                                    {% endif %}
+                                    
+                                    {% if lead.lead_type == 'monthly_payment_pending' and lead.monthly_amount %}
+                                    <p><strong>Aylık Tutar:</strong> {{ "%.2f"|format(lead.monthly_amount) }} ₺</p>
+                                    {% endif %}
+                                    
+                                    {% if lead.lead_type == 'one_time' and lead.one_time_amount %}
+                                    <p><strong>Ödeme Tutarı:</strong> {{ "%.2f"|format(lead.one_time_amount) }} ₺</p>
+                                    {% endif %}
+                                    
+                                    {% if lead.lead_type == 'monthly' and lead.monthly_amount %}
+                                    <p><strong>Aylık Tutar:</strong> {{ "%.2f"|format(lead.monthly_amount) }} ₺</p>
+                                    {% endif %}
+                                    
+                                    {% if lead.iban %}
+                                    <p><strong>IBAN:</strong> <code>{{ lead.iban }}</code></p>
+                                    {% if lead.recipient_full_name %}
+                                    <p><strong>Alıcı:</strong> {{ lead.recipient_full_name }}</p>
+                                    {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if lead.next_payment_date %}
+                                    <p><strong>Sonraki Ödeme:</strong> 
+                                        <span class="{% if lead.next_payment_date <= now %}text-danger font-weight-bold{% endif %}">
+                                            {{ lead.next_payment_date.strftime('%d.%m.%Y') }}
+                                            {% if lead.next_payment_date <= now %}
+                                                <span class="badge badge-danger ml-2">Gecikmiş</span>
+                                            {% endif %}
+                                        </span>
+                                    </p>
+                                    {% endif %}
+
+                                    {% if lead.status == 'cancelled' and lead.lead_type == 'monthly' %}
+                                    <div class="alert alert-danger alert-sticky mt-2">
+                                        <small>
+                                          <i class="fas fa-info-circle"></i>
+                                          Hizmet iptal edildi. {% if lead.next_payment_date %}Son ödeme tarihine kadar ({{ lead.next_payment_date.strftime('%d.%m.%Y') }}) kullanabilirsiniz.{% endif %} Yeni ödeme alınmayacaktır.
+                                          Eğer yanlış olduğunu düşünüyorsanız iptali kaldırmak için
+                                          <a href="{{ url_for('helpdesk.new_ticket', 
+                                               topic='Diğer', 
+                                               subject='Hizmet İptal İtirazı', 
+                                               message=(
+                                                 'Hizmet iptali hakkında itiraz ediyorum.\n' ~
+                                                 '- Hizmet Türü: ' ~ ( 'Aylık Paket' if lead.lead_type == 'monthly' else ('Tek Hizmet' if lead.lead_type == 'one_time' else lead.lead_type) ) ~ '\n' ~
+                                                 '- Paket Adı: ' ~ (lead.service.name if lead.service else '-') ~ '\n' ~
+                                                 '- Oluşturulma: ' ~ lead.created_at.strftime('%d.%m.%Y %H:%M') ~ '\n' ~
+                                                 ( '- Sonraki Ödeme: ' ~ lead.next_payment_date.strftime('%d.%m.%Y') ~ '\n' if lead.next_payment_date else '' ) ~
+                                                 'Lütfen iptalin kaldırılmasını değerlendirir misiniz?'
+                                               ),
+                                               priority='urgent'
+                                           ) }}" class="alert-link">ticket</a> açabilirsiniz.
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if lead.meeting_date and lead.meeting_link %}
+                                    {% set now_dt = (now if now.__class__.__name__ == 'date' else now.date()) %}
+                                    {% if lead.meeting_date.date() >= now_dt %}
+                                    <p><strong>Toplantı:</strong> {{ lead.meeting_date.strftime('%d.%m.%Y %H:%M') }}</p>
+                                    <p><strong>Link:</strong> <a href="{{ lead.meeting_link }}" target="_blank">{{ lead.meeting_link }}</a></p>
+                                    {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if appt2_cancelled %}
+                                    {% if lead.lead_type == 'one_time_meeting_pending' %}
+                                    <div class="alert alert-light alert-sticky mt-2">
+                                        <small><i class="fas fa-info-circle"></i> Randevu iptal edildi. Lütfen yeniden randevu planlayın.</small>
+                                    </div>
+                                    {% elif lead.lead_type == 'one_time' and lead.status == 'paid' %}
+                                    <div class="alert alert-danger alert-sticky mt-2">
+                                        <small>
+                                            <i class="fas fa-times-circle"></i> Toplantı iptal edildi. Ödeme alındıktan sonraki görüşme iptal edilmiş durumda.
+                                            Eğer yanlış olduğunu düşünüyorsanız <a href="{{ url_for('helpdesk.new_ticket',
+                                                topic='Randevu & Görüşme',
+                                                subject='Tek Hizmet Toplantı İptali Hk.',
+                                                message=(
+                                                  'Tek hizmet toplantısı iptal edildi.\n' ~
+                                                  '- Hizmet: ' ~ (lead.service.name if lead.service else '-') ~ '\n' ~
+                                                  '- Oluşturulma: ' ~ lead.created_at.strftime('%d.%m.%Y %H:%M') ~ '\n' ~
+                                                  'Lütfen durumun yeniden değerlendirilmesini rica ederim.'
+                                                ),
+                                                priority='urgent') }}" class="alert-link">ticket</a> açabilirsiniz.
+                                        </small>
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-light mt-2">
+                                        <small><i class="fas fa-info-circle"></i> Randevu iptal edildi. Lütfen yeniden randevu planlayın.</small>
+                                    </div>
+                                    {% endif %}
+                                    {% elif lead.status == 'payment_pending' %}
+                                    <div class="alert alert-warning mt-2">
+                                        <small><i class="fas fa-info-circle"></i> Ödeme yaptıktan sonra hizmet detayları belirlenecektir.</small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if lead.lead_type in ['one_time_payment_pending', 'monthly_payment_pending'] and lead.status == 'payment_pending' %}
+                                    <div class="alert alert-info mt-2">
+                                        <small><i class="fas fa-credit-card"></i> Ödeme bilgileri gönderildi. Ödeme yaptıktan sonra toplantı planlanacaktır.</small>
+                                        
+                                        <!-- Ödeme Bildirimi Butonu -->
+                                        <div class="mt-2">
+                                            <button type="button" 
+                                                    class="btn btn-success btn-sm payment-notify-btn" 
+                                                    data-lead-id="{{ lead.id }}"
+                                                    onclick="notifyPayment({{ lead.id }})">
+                                                <i class="fas fa-check"></i> Ödendi
+                                            </button>
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fas fa-info-circle"></i> Ödeme yaptıysanız bu butona tıklayın
+                                            </small>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if lead.status == 'paid' %}
+                                    <div class="alert alert-info mt-2">
+                                        <small><i class="fas fa-clock"></i> Ödemeniz alındı. Toplantı planlanıyor...</small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if lead.status == 'completed' %}
+                                        {% set notification_id = "service_completed_" + lead.id|string %}
+                                        {% if not current_user.has_seen_notification('service_completed', notification_id) %}
+                                        <div class="alert alert-success mt-2" data-notification-id="{{ notification_id }}">
+                                            <small><i class="fas fa-check-circle"></i> Hizmet tamamlandı.</small>
+                                        </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Boş durum -->
+    {% if not customer_services and not service_requests and not leads %}
+    <div class="row">
+        <div class="col-12">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3>Henüz hizmet talebiniz yok</h3>
+                <p>Hizmetlerimizden birini seçerek ön görüşme talep edebilirsiniz.</p>
+                <a href="{{ url_for('public.services') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Hizmet Seç
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.service-card, .lead-card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.service-card:hover, .lead-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.service-card-header, .lead-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.service-card-header h5, .lead-card-header h5 {
+    margin: 0;
+    color: #333;
+}
+
+.service-card-body, .lead-card-body {
+    color: #666;
+}
+
+.service-card-body p, .lead-card-body p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Badge renkleri */
+.badge-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.badge-info {
+    background-color: #17a2b8 !important;
+    color: white !important;
+}
+
+.badge-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.badge-primary {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.badge-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.badge-secondary {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+}
+</style>
+
+<!-- Ödeme Bildirimi JavaScript -->
+<script>
+function notifyPayment(leadId) {
+    if (confirm('Ödeme yaptığınızı onaylıyor musunuz? Bu işlem geri alınamaz.')) {
+        // Butonu devre dışı bırak
+        const btn = document.querySelector(`[data-lead-id="${leadId}"]`);
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gönderiliyor...';
+        
+        // Form oluştur ve gönder
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ url_for('account.notify_payment', lead_id=0) }}".replace('0', leadId);
+        
+        // CSRF token ekle
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Sayfa yüklendiğinde ödeme bildirimi yapılmış lead'lerde butonu devre dışı bırak
+document.addEventListener('DOMContentLoaded', function() {
+    // Ödeme bildirimi yapılmış lead'ler için butonları devre dışı bırak
+    const paymentButtons = document.querySelectorAll('.payment-notify-btn');
+    paymentButtons.forEach(btn => {
+        const leadId = btn.getAttribute('data-lead-id');
+        // Eğer bu lead için ödeme bildirimi yapılmışsa butonu devre dışı bırak
+        // Bu bilgi localStorage'da saklanabilir veya server'dan alınabilir
+        if (localStorage.getItem(`payment_notified_${leadId}`)) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-check"></i> Bildirildi';
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-secondary');
+        }
+    });
+});
+</script>
+
+<script>
+// Mark notifications as seen when they are displayed
+document.addEventListener('DOMContentLoaded', function() {
+    const notifications = document.querySelectorAll('.alert-success[data-notification-id]');
+    notifications.forEach(function(notification) {
+        const notificationId = notification.getAttribute('data-notification-id');
+        const notificationType = 'service_completed';
+        
+        // Mark as seen via AJAX
+        fetch('{{ url_for("account.mark_notification_seen") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                type: notificationType,
+                id: notificationId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Notification marked as seen:', notificationId);
+            }
+        })
+        .catch(error => {
+            console.error('Error marking notification as seen:', error);
+        });
+    });
+});
+</script>
+{% endblock %}

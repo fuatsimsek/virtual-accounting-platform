@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Page Header-->
+<header class="masthead position-relative" style="background-image: url('https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1200&q=80');">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(20,30,50,0.55);z-index:1;"></div>
+    <div class="container position-relative px-4 px-lg-5" style="z-index:2;">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7 text-center">
+                <div class="site-heading">
+                    <h1 style="color:#fff; font-weight:800; letter-spacing:1px; text-shadow:0 2px 8px #222;">Danışmanlık</h1>
+                    <span class="subheading" style="color:#e0e7ff; font-size:1.3rem; font-weight:500; text-shadow:0 1px 4px #222;">Profesyonel muhasebe danışmanlığı hizmetlerimiz</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content-->
+<main class="mb-4">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <!-- Consultation Process -->
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h2 class="text-center mb-4">Danışmanlık Sürecimiz</h2>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded-circle p-3">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-2">1. Ücretsiz Ön Görüşme</h5>
+                                        <p class="text-muted mb-0">5 dakikalık ücretsiz görüşme ile ihtiyaçlarınızı belirliyoruz.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded-circle p-3">
+                                            <i class="fas fa-video"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-2">2. Detaylı Danışmanlık</h5>
+                                        <p class="text-muted mb-0">Google Meet üzerinden detaylı görüşme gerçekleştiriyoruz.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded-circle p-3">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-2">3. Kişiye Özel Yol Haritası</h5>
+                                        <p class="text-muted mb-0">PDF formatında detaylı yol haritası sunuyoruz.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="bg-primary text-white rounded-circle p-3">
+                                            <i class="fas fa-headset"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-2">4. Sürekli Destek</h5>
+                                        <p class="text-muted mb-0">Danışmanlık sürecinde sürekli yanınızdayız.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Form -->
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="text-center mb-4">Randevu Formu</h2>
+                        
+                        <!-- Flash Messages -->
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <form method="POST" action="">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.email.label(class="form-label fw-bold") }}
+                                {{ form.email(class="form-control form-control-lg rounded-3") }}
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.appointment_date.label(class="form-label fw-bold") }}
+                                {{ form.appointment_date(class="form-control form-control-lg rounded-3", min=min_date.strftime('%Y-%m-%d'), max=max_date.strftime('%Y-%m-%d')) }}
+                                {% if form.appointment_date.errors %}
+                                    {% for error in form.appointment_date.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.appointment_time.label(class="form-label fw-bold") }}
+                                {{ form.appointment_time(class="form-control form-control-lg rounded-3") }}
+                                {% if form.appointment_time.errors %}
+                                    {% for error in form.appointment_time.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="mb-4">
+                                {{ form.purpose.label(class="form-label fw-bold") }}
+                                {{ form.purpose(class="form-control form-control-lg rounded-3", rows=4) }}
+                                {% if form.purpose.errors %}
+                                    {% for error in form.purpose.errors %}
+                                        <span class="text-danger">{{ error }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="text-center">
+                                {{ form.submit(class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+.bg-primary {
+    background: linear-gradient(45deg, #0d6efd, #0a58ca) !important;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.form-control {
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #0a58ca);
+    border: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+
+.rounded-circle {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rounded-circle i {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .rounded-circle {
+        width: 40px;
+        height: 40px;
+    }
+}
+</style>
+{% endblock content %}

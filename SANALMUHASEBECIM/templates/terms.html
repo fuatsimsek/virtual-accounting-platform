@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Kullanım Şartları{% endblock %}
+{% block content %}
+<section class="section-padding" style="padding-top: 120px; padding-bottom: 60px;">
+  <div class="container" style="max-width: 1000px; margin: 0 auto;">
+    <div class="mb-6">
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb" style="background: transparent; margin-bottom: 0;">
+          <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Ana Sayfa</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Kullanım Şartları</li>
+        </ol>
+      </nav>
+      <div class="rounded-2xl p-6 md:p-8 text-white" style="background: linear-gradient(135deg, #10b981 0%, #06b6d4 60%, #3b82f6 100%); box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <div class="flex items-start justify-between gap-6 flex-col md:flex-row">
+          <div class="flex-1">
+            <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">Kullanım Şartları</h1>
+            <p class="opacity-90 mt-2 text-sm md:text-base">Sitemizi kullanırken geçerli olan koşullar.</p>
+          </div>
+          <div class="flex items-center gap-3 w-full md:w-auto">
+            <a href="{{ url_for('public.contact') }}" class="btn-pill white w-full md:w-auto text-center"><i class="fas fa-envelope"></i> Sorun Bildir</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-0 overflow-hidden" style="border-radius: 16px;">
+      <div class="p-6 md:p-8 space-y-6" style="line-height: 1.75;">
+        <div class="rounded-xl p-5 bg-white border border-gray-200">
+          <h2 class="text-xl font-bold mb-3">1. Hizmet</h2>
+          <p class="text-gray-700">Sanal Muhasebecim, kullanıcılarına danışmanlık ve bilgi hizmeti sunar.</p>
+        </div>
+        <div class="rounded-xl p-5 bg-white border border-gray-200">
+          <h2 class="text-xl font-bold mb-3">2. Sorumluluk</h2>
+          <p class="text-gray-700">Sunulan bilgiler genel bilgilendirme amaçlıdır. Karar almadan önce profesyonel danışmanlık almanız önerilir.</p>
+        </div>
+        <div class="rounded-xl p-5 bg-white border border-gray-200">
+          <h2 class="text-xl font-bold mb-3">3. Fikri Mülkiyet</h2>
+          <p class="text-gray-700">Sitedeki içeriklerin tüm hakları saklıdır. İzinsiz kopyalanamaz veya çoğaltılamaz.</p>
+        </div>
+        <div class="rounded-xl p-5 bg-white border border-gray-200">
+          <h2 class="text-xl font-bold mb-3">4. Değişiklik</h2>
+          <p class="text-gray-700">Sanal Muhasebecim, kullanım koşullarını önceden haber vermeksizin değiştirme hakkını saklı tutar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+

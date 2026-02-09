@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h1 class="mb-0">
+                        <i class="fas fa-shield-alt me-3"></i>
+                        Gizlilik Politikası
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75">Son güncelleme: Ocak 2025</p>
+                </div>
+                <div class="card-body p-5">
+                    <div class="privacy-content">
+                        <h2 class="text-primary mb-4">1. Genel Bilgiler</h2>
+                        <p class="mb-4">
+                            Sanal Muhasebecim olarak, kişisel verilerinizin güvenliği bizim için son derece önemlidir. 
+                            Bu gizlilik politikası, hangi bilgileri topladığımızı, nasıl kullandığımızı ve koruduğumuzu açıklar.
+                        </p>
+
+                        <h2 class="text-primary mb-4">2. Topladığımız Bilgiler</h2>
+                        <ul class="mb-4">
+                            <li><strong>Kişisel Bilgiler:</strong> Ad, soyad, e-posta adresi, telefon numarası</li>
+                            <li><strong>İş Bilgileri:</strong> Şirket adı, vergi numarası, işletme türü</li>
+                            <li><strong>Teknik Bilgiler:</strong> IP adresi, tarayıcı bilgileri, cihaz bilgileri</li>
+                            <li><strong>Kullanım Verileri:</strong> Site kullanım istatistikleri, sayfa ziyaretleri</li>
+                        </ul>
+
+                        <h2 class="text-primary mb-4">3. Bilgilerin Kullanım Amacı</h2>
+                        <ul class="mb-4">
+                            <li>Hizmetlerimizi sunmak ve iyileştirmek</li>
+                            <li>Müşteri desteği sağlamak</li>
+                            <li>Yasal yükümlülükleri yerine getirmek</li>
+                            <li>Güvenliği sağlamak</li>
+                            <li>İletişim kurmak ve bilgilendirme yapmak</li>
+                        </ul>
+
+                        <h2 class="text-primary mb-4">4. Bilgi Paylaşımı</h2>
+                        <p class="mb-4">
+                            Kişisel verilerinizi üçüncü taraflarla paylaşmaz, satmaz veya kiralamayız. 
+                            Sadece yasal zorunluluklar veya açık rızanız durumunda paylaşım yapılabilir.
+                        </p>
+
+                        <h2 class="text-primary mb-4">5. Veri Güvenliği</h2>
+                        <p class="mb-4">
+                            Verilerinizi korumak için endüstri standardı güvenlik önlemleri kullanıyoruz:
+                        </p>
+                        <ul class="mb-4">
+                            <li>SSL şifreleme</li>
+                            <li>Güvenli sunucu altyapısı</li>
+                            <li>Düzenli güvenlik güncellemeleri</li>
+                            <li>Erişim kontrolü ve yetkilendirme</li>
+                        </ul>
+
+                        <h2 class="text-primary mb-4">6. Çerezler</h2>
+                        <p class="mb-4">
+                            Web sitemizde çerezler kullanılmaktadır. Detaylı bilgi için 
+                            <a href="{{ url_for('public.cerez') }}" class="text-primary">Çerez Politikası</a> sayfamızı inceleyebilirsiniz.
+                        </p>
+
+                        <h2 class="text-primary mb-4">7. Haklarınız</h2>
+                        <p class="mb-4">KVKK kapsamında aşağıdaki haklara sahipsiniz:</p>
+                        <ul class="mb-4">
+                            <li>Kişisel verilerinize erişim hakkı</li>
+                            <li>Düzeltme ve güncelleme hakkı</li>
+                            <li>Silme hakkı</li>
+                            <li>İşlemeye itiraz hakkı</li>
+                            <li>Veri taşınabilirliği hakkı</li>
+                        </ul>
+
+                        <h2 class="text-primary mb-4">8. İletişim</h2>
+                        <p class="mb-4">
+                            Gizlilik politikamızla ilgili sorularınız için:
+                        </p>
+                        <div class="contact-info bg-light p-4 rounded">
+                            <p class="mb-2"><strong>E-posta:</strong> info@sanalmuhasebem.net</p>
+                            <p class="mb-2"><strong>Telefon:</strong> +90 xxx xxx xx xx</p>
+                            <p class="mb-0"><strong>Adres:</strong> [Şirket Adresi]</p>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <a href="{{ url_for('public.contact') }}" class="btn btn-primary me-3">
+                                <i class="fas fa-envelope me-2"></i>İletişime Geç
+                            </a>
+                            <a href="{{ url_for('public.kvkk') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-file-alt me-2"></i>KVKK Metni
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.privacy-content h2 {
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+
+.privacy-content ul {
+    padding-left: 20px;
+}
+
+.privacy-content li {
+    margin-bottom: 8px;
+}
+
+.contact-info {
+    border-left: 4px solid var(--primary-color);
+}
+</style>
+{% endblock %}

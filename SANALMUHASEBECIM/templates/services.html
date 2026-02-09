@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block meta_description %}Sanal Muhasebecim'in kapsamlı muhasebe hizmetleri. Muhasebe danışmanlığı, vergi danışmanlığı, finansal analiz ve dijital muhasebe çözümleri.{% endblock %}
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section hero-services">
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Hizmetlerimiz <span class="highlight">Kapsamlı</span>
+                </h1>
+                <p class="hero-subtitle">
+                    İşletmenizin finansal başarısı için ihtiyacınız olan tüm muhasebe hizmetleri. 
+                    Modern teknoloji ve uzman kadromuzla yanınızdayız.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Process Section -->
+<section class="process-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Çalışma Sürecimiz</h2>
+            <p class="section-subtitle">Nasıl çalışıyoruz?</p>
+        </div>
+        
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>İlk Görüşme</h3>
+                    <p>İhtiyaçlarınızı dinleyelim ve size en uygun çözümü önerelim.</p>
+                </div>
+            </div>
+            
+            <div class="process-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Analiz & Planlama</h3>
+                    <p>Mevcut durumunuzu analiz edelim ve detaylı bir plan hazırlayalım.</p>
+                </div>
+            </div>
+            
+            <div class="process-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Uygulama</h3>
+                    <p>Planlanan çözümleri hayata geçirelim ve süreçleri optimize edelim.</p>
+                </div>
+            </div>
+            
+            <div class="process-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Takip & Destek</h3>
+                    <p>Sürekli destek sağlayalım ve performansınızı takip edelim.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Info Section -->
+<section class="info-section">
+    <div class="container">
+        <div class="info-card">
+            <div class="info-content">
+                <h3>Talebinizi bize anlatın, en doğru çözüme birlikte karar verelim.</h3>
+                <p>Sadece 10 dakikanızı ayırın, işinizi büyütmeye başlayın.</p>
+                <p style="margin-top: .5rem; color:#475569">Çözüme birlikte karar verelim; dilerseniz alttaki paketleri de sonrasında değerlendirir ve size uygun hizmet planını sunarız. Fiyatlandırma, ücretsiz ön görüşme sonrası paylaşılır.</p>
+                <div class="info-features">
+                    <span class="info-feature">
+                        <i class="fas fa-check-circle"></i>
+                        Tamamen Ücretsiz
+                    </span>
+                    <span class="info-feature">
+                        <i class="fas fa-clock"></i>
+                        10 Dakika
+                    </span>
+                    <span class="info-feature">
+                        <i class="fas fa-video"></i>
+                        Online Toplantı
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Packages (Dynamic) Section -->
+<section class="pricing-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Hizmet Paketlerimiz</h2>
+            <p class="section-subtitle">İhtiyacınıza göre esnek ve şeffaf içerikler</p>
+        </div>
+        <div class="pricing-grid">
+          {% if packages and packages|length > 0 %}
+            {% for p in packages %}
+              {% set name_lower = (p.name or '')|lower %}
+              {% set is_standard = 'standart' in name_lower %}
+              {% set is_professional = 'profesyonel' in name_lower %}
+              {% set is_corporate = 'kurumsal' in name_lower %}
+              {% set icon_class = 'fa-briefcase' %}
+              {% if is_standard %}{% set icon_class = 'fa-rocket' %}{% elif is_professional %}{% set icon_class = 'fa-star' %}{% elif is_corporate %}{% set icon_class = 'fa-crown' %}{% endif %}
+              <div class="pricing-card {% if is_professional %}featured{% endif %}">
+                {% if is_professional %}<div class="pricing-badge">En Popüler</div>{% endif %}
+                <div class="pricing-header">
+                  <h3>{{ p.name }}</h3>
+                </div>
+                <ul class="pricing-features">
+                  {% if p.description %}
+                    {% for line in p.description.split('\n') if line.strip() %}
+                      <li><i class="fas fa-check"></i> {{ line.strip() }}</li>
+                    {% endfor %}
+                  {% else %}
+                    <li><i class="fas fa-check"></i> İçerik yakında eklenecek</li>
+                  {% endif %}
+                </ul>
+                <a href="{{ url_for('public.service_detail', slug=p.slug) }}#quote" class="btn btn-modern {% if is_professional %}btn-primary-modern{% else %}btn-outline-modern{% endif %}">
+                  <i class="fas {{ icon_class }}"></i>
+                  <span>İncele</span>
+                </a>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="pricing-card">
+                <div class="pricing-header"><h3>Standart Paket</h3></div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Aylık temel muhasebe danışmanlığı</li>
+                    <li><i class="fas fa-check"></i> Aylık özet finansal rapor</li>
+                    <li><i class="fas fa-check"></i> E-posta ile destek</li>
+                    <li><i class="fas fa-check"></i> Temel vergi takvimi hatırlatmaları</li>
+                </ul>
+                <a href="{{ url_for('public.service_detail', slug='standart-paket') }}" class="btn btn-modern btn-outline-modern"><i class="fas fa-rocket"></i><span>İncele</span></a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="pricing-badge">En Popüler</div>
+                <div class="pricing-header"><h3>Profesyonel Paket</h3></div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Kapsamlı muhasebe danışmanlığı</li>
+                    <li><i class="fas fa-check"></i> Haftalık detaylı raporlama</li>
+                    <li><i class="fas fa-check"></i> Telefon + e-posta destek</li>
+                    <li><i class="fas fa-check"></i> Vergi planlama ve optimizasyon</li>
+                    <li><i class="fas fa-check"></i> Finansal performans analizi</li>
+                </ul>
+                <a href="{{ url_for('public.service_detail', slug='profesyonel-paket') }}" class="btn btn-modern btn-primary-modern"><i class="fas fa-star"></i><span>İncele</span></a>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-header"><h3>Kurumsal Paket</h3></div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Tam kapsamlı muhasebe hizmeti</li>
+                    <li><i class="fas fa-check"></i> Günlük raporlama ve yönetici özeti</li>
+                    <li><i class="fas fa-check"></i> Öncelikli destek</li>
+                    <li><i class="fas fa-check"></i> Şirketinize özel stratejik danışmanlık</li>
+                    <li><i class="fas fa-check"></i> Süreç dijitalleştirme ve entegrasyon</li>
+                </ul>
+                <a href="{{ url_for('public.service_detail', slug='kurumsal-paket') }}" class="btn btn-modern btn-outline-modern"><i class="fas fa-crown"></i><span>İncele</span></a>
+            </div>
+          {% endif %}
+        </div>
+        <p style="text-align:center;color:#64748b;margin-top:1rem">Fiyatlar ücretsiz ön görüşme sonrası, ihtiyaçlarınıza göre şeffaf biçimde paylaşılır.</p>
+    </div>
+</section>
+
+<!-- Yeni hizmetler bölümü kaldırıldı; tüm hizmetler tek listede gösteriliyor -->
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Hemen Başlayın</h2>
+            <p>İhtiyaçlarınıza uygun hizmet paketini seçin ve hemen danışmanlık alın.</p>
+            <a href="{{ url_for('booking.index') }}" class="btn btn-modern btn-hero-modern">
+                <i class="fas fa-calendar-check"></i>
+                <span>20+ Yıllık Deneyim ile Danışmanlık Alın</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

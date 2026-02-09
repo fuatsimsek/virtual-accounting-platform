@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<main style="background: linear-gradient(135deg, #f8fafc 70%, #e0e7ff 100%); min-height: 60vh; padding: 40px 0;">
+    <div class="container py-5">
+        <div class="card shadow-lg border-0 rounded-4 bg-white">
+            <div class="card-header bg-primary text-white rounded-top-4 d-flex align-items-center gap-2" style="min-height:60px;">
+                <i class="fas fa-chart-bar fa-lg"></i>
+                <h4 class="mb-0 fw-bold">KULLANICI AKTİVİTE ÖZETİ</h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle text-center mb-0 rounded-4 overflow-hidden" style="background:#f8fafc;">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>ID</th>
+                                <th>İsim</th>
+                                <th>Toplam Post</th>
+                                <th>Attığı Yorum</th>
+                                <th>Postlarına Gelen Yorum</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in result %}
+                            <tr>
+                                <td class="fw-bold">{{ row.id }}</td>
+                                <td class="fw-semibold">{{ row.name }}</td>
+                                <td><span class="badge bg-info text-dark fs-6 px-3 py-2 rounded-pill shadow-sm">{{ row.total_posts }}</span></td>
+                                <td><span class="badge bg-success fs-6 px-3 py-2 rounded-pill shadow-sm">{{ row.total_comments }}</span></td>
+                                <td><span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill shadow-sm">{{ row.received_comments }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %} 

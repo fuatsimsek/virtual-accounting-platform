@@ -1,0 +1,846 @@
+{% extends 'base.html' %}
+{% block meta_description %}Uzman muhasebe ve vergi danışmanlığı. Aylık muhasebe, raporlama, mevzuat uyumu ve dijital çözümlerle KOBİ’lerin büyümesine destek veriyoruz.{% endblock %}
+{% block content %}
+
+<!-- Modern Hero Section -->
+<section class="hero-section">
+    <div class="hero-background">
+        <div class="hero-overlay"></div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Modern Muhasebe <span class="highlight">Çözümleri</span>
+                </h1>
+                <p class="hero-subtitle">
+                    İşletmenizi büyütmek, nakit akışınızı güçlendirmek ve vergi yükünüzü optimize etmek için uçtan uca muhasebe ve finans danışmanlığı sunuyoruz. 
+                    Dijital altyapımız, otomatik raporlama ve mevzuat uyum takibiyle; faturalamadan bordroya, KDV/BA/BS bildirimlerinden yıllık beyana kadar tüm süreçlerinizi güvenle yönetiyoruz. 
+                    Sektörünüze özel çözümler, şeffaf fiyatlama ve hızlı destek ile büyüme hedeflerinize odaklanmanızı sağlıyoruz.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Mutlu Müşteri</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">Yıl Deneyim</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">Hızlı</div>
+                        <div class="stat-label">Destek</div>
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <a href="{{ url_for('booking.index') }}" class="btn btn-primary btn-hero">
+                        <i class="fas fa-calendar-check"></i>
+                        Ücretsiz Ön Görüşme
+                    </a>
+                    <a href="{{ url_for('public.services') }}" class="btn btn-outline btn-hero">
+                        <i class="fas fa-briefcase"></i>
+                        Hizmetlerimiz
+                    </a>
+                </div>
+            </div>
+            <aside class="hero-popular">
+                <div class="popular-note">İhtiyacınıza yarayacak pratik çözümler ve güncel içerikler</div>
+                <h3 class="popular-title">Editörün Seçtikleri</h3>
+                <ul class="popular-list">
+                    {% for p in popular_posts %}
+                    <li class="popular-item">
+                        <a class="popular-card" href="{{ url_for('blog.post_detail', slug=p.slug) if p.slug else url_for('blog.index') }}">
+                            <div class="popular-rank">{{ loop.index }}</div>
+                            {# thumbnail removed #}
+                            <div class="popular-body">
+                                <div class="popular-heading">{{ p.title }}</div>
+                                {% if p.subtitle %}<div class="popular-sub">{{ p.subtitle }}</div>{% endif %}
+                                <div class="popular-meta">
+                                    <span><i class="far fa-heart"></i> {{ p.likes|length }}</span>
+                                    <span><i class="far fa-comment"></i> {{ p.comments|length }}</span>
+                                </div>
+                            </div>
+                            <div class="popular-arrow"><i class="fas fa-chevron-right"></i></div>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="popular-item"><span class="popular-empty">Henüz popüler yazı yok.</span></li>
+                    {% endfor %}
+                </ul>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<!-- Services Preview Section -->
+<section class="services-preview">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Hizmetlerimiz</h2>
+            <p class="section-subtitle">İşletmenizin ihtiyaçlarına özel muhasebe çözümleri</p>
+        </div>
+        
+        <div class="services-grid">
+            {% for service in services %}
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-{% if loop.index == 1 %}calculator{% elif loop.index == 2 %}file-invoice-dollar{% elif loop.index == 3 %}chart-bar{% elif loop.index == 4 %}handshake{% elif loop.index == 5 %}shield-alt{% else %}cog{% endif %}"></i>
+                </div>
+                <h3 class="service-title">{{ service.name }}</h3>
+                <p class="service-description">{{ service.description[:100] }}{% if service.description|length > 100 %}...{% endif %}</p>
+                <a href="{{ url_for('public.service_detail', slug=service.slug) }}" class="service-link">
+                    Detayları Gör <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="services-cta">
+            <a href="{{ url_for('public.services') }}" class="btn btn-secondary btn-large">
+                Tüm Hizmetlerimizi Keşfedin
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Section -->
+<section class="blog-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Son Blog Yazılarımız</h2>
+            <p class="section-subtitle">Muhasebe ve finans dünyasından güncel bilgiler</p>
+        </div>
+        
+        <div class="blog-grid">
+            {% set _items = posts_items if posts_items is defined else (posts.items if posts and posts.items else []) %}
+            {% for post in _items %}
+            <article class="blog-card">
+                <div class="blog-card-header">
+                    <div class="blog-category">
+                        <span class="category-badge">Blog</span>
+                    </div>
+                    <div class="blog-meta">
+                        <span class="blog-date">
+                            <i class="far fa-calendar"></i>
+                            {% set tr_months = {1:'Ocak',2:'Şubat',3:'Mart',4:'Nisan',5:'Mayıs',6:'Haziran',7:'Temmuz',8:'Ağustos',9:'Eylül',10:'Ekim',11:'Kasım',12:'Aralık'} %}
+                            {{ '%02d'|format((post.published_at or post.post_date).day) }} {{ tr_months[(post.published_at or post.post_date).month] }} {{ (post.published_at or post.post_date).year }}
+                        </span>
+                        <span class="blog-read-time">
+                            <i class="far fa-clock"></i>
+                            {% set word_count = (post.post_text|striptags)|wordcount %}
+                            {% set reading_time = (word_count / 200)|round|int %}
+                            {% if reading_time < 1 %}1{% else %}{{ reading_time }}{% endif %} dk
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="blog-card-content">
+                    <h3 class="blog-title">
+                        <a href="{{ url_for('blog.post_detail', slug=post.slug) if post.slug else url_for('blog.index') }}">
+                            {{ post.title }}
+                        </a>
+                    </h3>
+                    {% set raw_excerpt = post.subtitle or post.excerpt or post.post_text %}
+                    {% set clean_excerpt = raw_excerpt|striptags %}
+                    <p class="blog-excerpt">{{ clean_excerpt|truncate(150, True, '...') }}</p>
+                </div>
+                
+                <div class="blog-card-footer">
+                    <div class="blog-author">
+                        <div class="author-avatar">
+                            {% if post.author and post.author.profile_photo %}
+                            <img src="{{ post.author.profile_photo }}" alt="{{ post.author.name }}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;" />
+                            {% else %}
+                            <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div class="author-info">
+                            <span class="author-name">{{ post.author.name }}</span>
+                            <span class="author-title">Muhasebe Uzmanı</span>
+                        </div>
+                    </div>
+                    <div class="blog-actions">
+                        <a href="{{ url_for('blog.post_detail', slug=post.slug) if post.slug else url_for('blog.index') }}" class="read-more">
+                            Devamını Oku <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        
+        {% if prev_url or next_url %}
+        <div class="blog-pagination">
+            {% if prev_url %}
+            <a href="{{ prev_url }}" class="pagination-btn">
+                <i class="fas fa-chevron-left"></i> Önceki
+            </a>
+            {% endif %}
+            
+            <div class="pagination-info">
+                Blog yazıları
+            </div>
+            
+            {% if next_url %}
+            <a href="{{ next_url }}" class="pagination-btn">
+                Sonraki <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">İşletmenizi Büyütmeye Hazır mısınız?</h2>
+            <p class="cta-subtitle">
+                Uzman muhasebe danışmanlarımızla tanışın ve finansal hedeflerinize ulaşın.
+            </p>
+            <div class="cta-actions">
+                <a href="{{ url_for('booking.index') }}" class="btn btn-primary btn-large">
+                    <i class="fas fa-calendar-check"></i>
+                    20+ Yıllık Deneyim ile Danışmanlık Alın
+                </a>
+                <a href="{{ url_for('public.contact') }}" class="btn btn-outline btn-large">
+                    <i class="fas fa-phone"></i>
+                    Bizi Arayın
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Hero Section */
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--gradient-primary);
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.hero-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+    width: 100px;
+    height: 100px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+/* Hero short note */
+.hero-note {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+    color: #fff;
+    font-size: .9rem;
+    font-weight: 600;
+    letter-spacing: .2px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.28);
+    padding: 8px 12px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+.highlight {
+    background: linear-gradient(45deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fbbf24;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-hero {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: var(--border-radius-xl);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition-normal);
+}
+
+.btn-primary {
+    background: var(--gradient-secondary);
+    border: none;
+    color: white;
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+    color: white;
+}
+
+.btn-outline {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-popular{
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: var(--border-radius-xl);
+    padding: 1rem 1.25rem;
+    backdrop-filter: blur(8px);
+}
+.popular-title{ color:#fff; font-weight:700; font-size:1.125rem; margin:0 0 .75rem 0; }
+.popular-note{ color:#fff; font-weight:600; font-size:.9rem; margin:0 0 .35rem 0; opacity:.92; }
+.popular-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
+.popular-item{ }
+.popular-card{ text-decoration:none; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.9rem; padding:.6rem .6rem; border-radius:14px; transition:background .2s ease, transform .2s ease; }
+.popular-card:hover{ background:rgba(255,255,255,0.12); transform: translateX(2px); }
+.popular-rank{ width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.9rem; }
+.popular-thumb{ display:none; }
+.popular-card:hover .popular-thumb img{ transform: scale(1.03); }
+.popular-card *{ transition: none; }
+.popular-card:hover *, .popular-thumb *, .popular-thumb img, .popular-thumb svg {
+    animation: none !important;
+    transform: none !important;
+}
+.hero-popular .fa-spin { animation: none !important; }
+.popular-thumb svg{ filter: drop-shadow(0 2px 6px rgba(255,255,255,0.25)); }
+.popular-thumb.placeholder{ background: linear-gradient(135deg, rgba(59,130,246,0.35), rgba(139,92,246,0.35)); border-color: rgba(255,255,255,0.35); }
+.popular-thumb.placeholder i{ color:#fff; opacity:1; font-size:1.1rem; }
+.popular-body{ min-width:0; }
+.popular-heading{ color:#fff; font-weight:600; font-size:.95rem; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.popular-sub{ color:rgba(255,255,255,0.85); font-size:.8rem; line-height:1.25; margin-top:.15rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.popular-meta{ margin-top:.35rem; display:flex; gap:.75rem; color:rgba(255,255,255,0.8); font-size:.78rem; }
+.popular-meta i{ margin-right:.25rem; }
+.popular-arrow{ color:#fff; opacity:.8; }
+.popular-empty{ color:rgba(255,255,255,0.8); font-size:.9rem; }
+
+.hero-image {
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-image i {
+    font-size: 6rem;
+    color: #fbbf24;
+}
+
+/* Services Preview */
+.services-preview {
+    padding: 6rem 0;
+    background: var(--bg-secondary);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.service-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-normal);
+    border: 1px solid var(--border-light);
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.service-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.service-icon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.service-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.service-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.service-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition-fast);
+}
+
+.service-link:hover {
+    color: var(--primary-dark);
+    gap: 0.75rem;
+}
+
+.services-cta {
+    text-align: center;
+}
+
+.btn-secondary {
+    background: var(--gradient-success);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius-lg);
+    font-weight: 600;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    color: white;
+}
+
+.btn-large {
+    padding: 1.25rem 2.5rem;
+    font-size: 1.1rem;
+}
+
+/* Blog Section */
+.blog-section {
+    padding: 6rem 0;
+    background: white;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.blog-card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    border: 1px solid var(--border-light);
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.blog-card-header {
+    padding: 1.5rem 1.5rem 0;
+}
+
+.blog-category {
+    margin-bottom: 1rem;
+}
+
+.category-badge {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius-lg);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.blog-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.blog-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.blog-card-content {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.blog-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.blog-title a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.blog-title a:hover {
+    color: var(--primary-color);
+}
+
+.blog-excerpt {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.blog-card-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.blog-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.author-title {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.read-more {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition-fast);
+}
+
+.read-more:hover {
+    color: var(--primary-dark);
+    gap: 0.75rem;
+}
+
+.blog-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pagination-btn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pagination-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.pagination-info {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 6rem 0;
+    background: var(--gradient-warning);
+    text-align: center;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 991.98px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+    }
+    .hero-note { left: 50%; right: auto; transform: translateX(-50%); top: 10px; font-size: .85rem; }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        justify-content: center;
+    }
+    
+    .hero-actions {
+        justify-content: center;
+    }
+    
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .blog-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+    }
+    
+    .hero-popular{ text-align:left; }
+}
+</style>
+
+{% endblock %}

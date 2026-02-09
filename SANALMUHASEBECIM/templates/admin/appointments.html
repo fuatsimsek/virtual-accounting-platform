@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Page Header-->
+<header class="masthead position-relative" style="background-image: url('https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=1200&q=80');">
+	<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(20,30,50,0.55);z-index:1;"></div>
+	<div class="container position-relative px-4 px-lg-5" style="z-index:2;">
+		<div class="row gx-4 gx-lg-5 justify-content-center">
+			<div class="col-md-10 col-lg-8 col-xl-7 text-center">
+				<div class="site-heading">
+					<h1 style="color:#fff; font-weight:800; letter-spacing:1px; text-shadow:0 2px 8px #222;">Randevularım</h1>
+					<span class="subheading" style="color:#e0e7ff; font-size:1.3rem; font-weight:500; text-shadow:0 1px 4px #222;">Danışmanlık randevularınızı yönetin</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+<main class="mb-4" style="background: linear-gradient(135deg, #f8fafc 70%, #e0e7ff 100%); min-height: 60vh; padding-bottom: 60px;">
+	<div class="container py-5">
+		<div class="card shadow-lg border-0 rounded-4 bg-white">
+			<div class="card-header bg-primary text-white rounded-top-4 d-flex align-items-center gap-2" style="min-height:60px;">
+				<i class="fas fa-calendar-alt fa-lg"></i>
+				<h4 class="mb-0 fw-bold">Randevu Yönetimi</h4>
+			</div>
+			<div class="card-body p-4">
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="alert alert-{{ category }} shadow-sm rounded-3 d-flex align-items-center gap-2">
+								{% if 'lead' in message.lower() or 'leads' in message.lower() %}
+									<i class="fas fa-users text-success"></i>
+								{% elif 'onaylandı' in message.lower() %}
+									<i class="fas fa-check-circle text-success"></i>
+								{% elif 'hata' in message.lower() %}
+									<i class="fas fa-exclamation-triangle text-danger"></i>
+								{% else %}
+									<i class="fas fa-info-circle text-info"></i>
+								{% endif %}
+								<div>
+									{{ message }}
+									{% if 'lead' in message.lower() or 'leads' in message.lower() %}
+										<div class="mt-1">
+											<a href="{{ url_for('admin.leads') }}" class="btn btn-sm btn-outline-success">
+												<i class="fas fa-eye mr-1"></i>Leads Sayfasını Görüntüle
+											</a>
+										</div>
+									{% endif %}
+								</div>
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Email</th>
+								<th>Hizmet</th>
+								<th>Tarih</th>
+								<th>Saat</th>
+								<th>Durum</th>
+								<th>Platform</th>
+								<th>Durum</th>
+								<th>İşlemler</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for appointment in appointments %}
+							<tr>
+								<td>{{ appointment.id }}</td>
+								<td>{{ appointment.email }}</td>
+								<td>
+									{% if appointment.service_request %}
+										<span class="badge bg-info">{{ appointment.service_request.service.name }}</span>
+									{% else %}
+										<span class="text-muted">-</span>
+									{% endif %}
+								</td>
+								<td>{{ appointment.appointment_datetime.strftime('%d-%m-%Y') }}</td>
+								<td>{{ appointment.appointment_datetime.strftime('%H:%M') }}</td>
+								<td>
+									<div class="d-flex flex-column">
+										<span class="badge {% if appointment.status == 'confirmed' %}bg-success{% elif appointment.status == 'email_confirmed' %}bg-warning{% elif appointment.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+											{% if appointment.status == 'email_confirmed' %}Randevu Onayı Bekleniyor{% elif appointment.status == 'confirmed' %}Onaylandı{% elif appointment.status == 'cancelled' %}İptal{% else %}Randevu Onayı Bekleniyor{% endif %}
+										</span>
+										{% if appointment.status == 'cancelled' and appointment.notes %}
+										  {% if 'cancelled_by_user' in appointment.notes %}
+										  <small class="text-muted mt-1">Kullanıcı tarafından iptal edildi</small>
+										  {% elif 'cancelled_by_admin' in appointment.notes %}
+										  <small class="text-muted mt-1">Admin tarafından iptal edildi</small>
+										  {% endif %}
+										{% endif %}
+									</div>
+								</td>
+								<td>
+									<span class="badge bg-secondary">{{ appointment.platform or '-' }}</span>
+								</td>
+								<td>
+									<form method="post" action="{{ url_for('admin.update_appointment_status', appointment_id=appointment.id) }}" class="d-flex gap-2 align-items-center flex-wrap">
+										<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+										<select id="status_select_{{ appointment.id }}" name="status" class="form-select form-select-sm w-auto" {% if appointment.status == 'cancelled' %}disabled{% endif %}>
+											<option value="pending" {% if appointment.status=='pending' %}selected{% endif %}>Randevu Onayı Bekleniyor</option>
+											<option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %}>Onaylandı</option>
+											<option value="cancelled" {% if appointment.status=='cancelled' %}selected{% endif %}>İptal</option>
+										</select>
+										{%- set pf = appointment.platform -%}
+										{%- set pf_label = 'Toplantı' -%}
+										{%- if pf == 'meet' -%}{% set pf_label = 'Google Meet' %}{%- elif pf == 'zoom' -%}{% set pf_label = 'Zoom' %}{%- elif pf == 'teams' -%}{% set pf_label = 'Microsoft Teams' %}{%- endif -%}
+										<input name="meeting_link" class="form-control form-control-sm" style="min-width:220px" placeholder="{{ pf_label }} linki" value="{{ appointment.meeting_link or '' }}" />
+										{% if appointment.service_request and appointment.service_request.additional_details %}
+										<div class="mt-1">
+											<small class="text-muted">
+												<strong>Ekstra Detaylar:</strong> {{ appointment.service_request.additional_details[:100] }}{% if appointment.service_request.additional_details|length > 100 %}...{% endif %}
+											</small>
+										</div>
+										{% endif %}
+										<button id="save_btn_{{ appointment.id }}" class="btn btn-sm btn-outline-success" {% if appointment.status == 'cancelled' %}disabled title="İptal edilmiş randevu düzenlenemez"{% endif %}>Kaydet</button>
+										{% if appointment.status == 'cancelled' %}
+										<button type="button" class="btn btn-sm btn-secondary" title="Geri Al" onclick="(function(){
+										  var sel=document.getElementById('status_select_{{ appointment.id }}');
+										  var btn=document.getElementById('save_btn_{{ appointment.id }}');
+										  if(sel){ sel.removeAttribute('disabled'); }
+										  if(btn){ btn.removeAttribute('disabled'); btn.removeAttribute('title'); }
+										})()">Geri Al</button>
+										{% endif %}
+									</form>
+								</td>
+								<td>
+									<form method="POST" action="{{ url_for('admin.delete_appointment', appointment_id=appointment.id) }}" class="d-inline">
+										<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+										<button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bu randevuyu silmek istediğinizden emin misiniz?')">
+											<i class="fas fa-trash"></i>
+										</button>
+									</form>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+{% endblock content %}

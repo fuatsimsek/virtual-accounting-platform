@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Gönderi Düzenle{% endblock %}
+
+{% block head %}
+<!-- TinyMCE (self-hosted local) -->
+<script src="{{ url_for('static', filename='tinymce-main/tinymce.min.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<section class="services-grid-section">
+  <div class="container">
+    <div class="card" style="padding: 30px;">
+      <h2 style="margin-bottom: 16px;">Gönderi Düzenle</h2>
+      <form method="post" action="{{ url_for('blog.edit_post', post_id=post.id) }}" id="editBlogForm">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          <label>Başlık</label>
+          {{ form.title(class_='form-control title-input') }}
+        </div>
+
+        <div class="form-group">
+          <label>Alt Başlık</label>
+          {{ form.subtitle(class_='form-control subtitle-input') }}
+        </div>
+
+        <div class="form-group">
+          <label>İçerik</label>
+          <div class="tinymce-container">
+            {{ form.post_text(class_='tinymce-editor', id='postContent') }}
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; justify-content:flex-end;">
+          <a href="{{ url_for('blog.post_detail', slug=post.slug) }}" class="btn-secondary">İptal</a>
+          <button class="btn btn-primary" type="submit" id="updateBtn">Güncelle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+// TinyMCE init (match create_post setup)
+tinymce.init({
+  selector: '#postContent',
+  height: 500,
+  base_url: '{{ url_for('static', filename='tinymce-main') }}',
+  suffix: '.min',
+  license_key: 'gpl',
+  plugins: [
+    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+  ],
+  toolbar: 'undo redo | blocks | bold italic underline strikethrough | ' +
+           'alignleft aligncenter alignright alignjustify | ' +
+           'bullist numlist outdent indent | link image media table | ' +
+           'forecolor backcolor | removeformat | code fullscreen',
+  menubar: 'file edit view insert format tools table help'
+});
+
+document.getElementById('editBlogForm').addEventListener('submit', function() {
+  if (tinymce && tinymce.triggerSave) tinymce.triggerSave();
+});
+</script>
+{% endblock %}
+
+

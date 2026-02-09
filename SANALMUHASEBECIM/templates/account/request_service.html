@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Hizmet Talep Et - {{ service.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <div class="service-icon me-3">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-0">{{ service.name }}</h2>
+                            <p class="text-muted mb-0">Ön Görüşme Talebi</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if service.summary %}
+                    <div class="service-summary mb-4">
+                        <h5>Hizmet Özeti</h5>
+                        <p>{{ service.summary }}</p>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="request-form">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group mb-4">
+                            <label for="{{ form.additional_details.id }}" class="form-label">
+                                <i class="fas fa-edit"></i> Ekstra Detaylar
+                            </label>
+                            <div class="form-text mb-2">
+                                Bu paketle ilgili ekstra ihtiyaçlarınızı veya özel isteklerinizi yazabilirsiniz. 
+                                Bu bilgiler size özel teklif hazırlamamıza yardımcı olacaktır.
+                            </div>
+                            {{ form.additional_details(class_='form-control', rows=6, placeholder='Örneğin: Şirketimizin özel ihtiyaçları, tercih ettiğiniz iletişim yöntemi, aciliyet durumu vb.') }}
+                            {% if form.additional_details.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.additional_details.errors %}
+                                {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="request-info mb-4">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Ön Görüşme Süreci</h6>
+                                <ul class="mb-0">
+                                    <li>Talebiniz alındıktan sonra 24 saat içinde size dönüş yapacağız</li>
+                                    <li>Görüşme tarihi ve saati birlikte belirleyeceğiz</li>
+                                    <li>Görüşme sonrası size özel teklif hazırlayacağız</li>
+                                    <li>Teklifi onayladığınızda hizmet başlayacak</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-calendar-check"></i> Ön Görüşme Talep Et
+                            </button>
+                            <a href="{{ url_for('public.service_detail', slug=service.slug) }}" class="btn btn-outline-secondary btn-lg ms-2">
+                                <i class="fas fa-arrow-left"></i> Geri Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.service-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.service-summary {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.service-summary h5 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.request-form .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.request-form .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.request-form .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.request-info .alert {
+    border: none;
+    border-radius: 8px;
+    background: #e3f2fd;
+    color: #0d47a1;
+}
+
+.request-info ul {
+    padding-left: 1.2rem;
+}
+
+.request-info li {
+    margin-bottom: 0.5rem;
+}
+
+.form-actions {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-radius: 12px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1.5rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+</style>
+{% endblock %}

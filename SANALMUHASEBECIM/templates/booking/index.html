@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+{% block title %}Ön Görüşme & Randevu{% endblock %}
+{% block meta_description %}Önce ücretsiz bir ön görüşme ile talebinizi dinleyelim, ardından talebinizi gerçekleştirmek için toplantı ve ücret planlayalım.{% endblock %}
+{% block content %}
+
+<!-- Enhanced Hero Section -->
+<section class="hero-section hero-booking">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="floating-elements">
+        <div class="floating-icon" data-speed="2">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="floating-icon" data-speed="-1">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <div class="floating-icon" data-speed="1.5">
+          <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <i class="fas fa-star"></i>
+          <span>Ücretsiz 10 Dakikalık Ön Görüşme</span>
+        </div>
+        <h1 class="hero-title">
+          İşinizi <span class="highlight">Büyütmek</span> İçin
+          <br>Profesyonel <span class="gradient-text">Muhasebe</span> Desteği
+        </h1>
+        <p class="hero-subtitle">
+          İhtiyaçlarınızı dinliyor, mevcut durumunuzu analiz ediyoruz.
+        </p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Mutlu Müşteri</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">20+</div>
+            <div class="stat-label">Yıl Deneyim</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">Hızlı</div>
+            <div class="stat-label">Destek</div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          {% if current_user.is_authenticated %}
+          <a class="btn btn-primary btn-hero-modern" href="{{ url_for('booking.new_appointment') }}">
+            <i class="fas fa-calendar-check"></i>
+            <span>Ön Görüşme Planla</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          {% else %}
+          <a class="btn btn-primary btn-hero-modern" href="{{ url_for('account.login', next=url_for('booking.new_appointment')) }}">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Giriş Yap ve Planla</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          <a class="btn btn-outline-modern" href="{{ url_for('account.register') }}">
+            <i class="fas fa-user-plus"></i>
+            <span>Hemen Kayıt Ol</span>
+          </a>
+          {% endif %}
+        </div>
+        <div class="hero-trust">
+          <div class="trust-badges">
+            <div class="trust-badge">
+              <i class="fas fa-shield-alt"></i>
+              <span>Güvenli</span>
+            </div>
+            <div class="trust-badge">
+              <i class="fas fa-clock"></i>
+              <span>Hızlı</span>
+            </div>
+            <div class="trust-badge">
+              <i class="fas fa-certificate"></i>
+              <span>Sertifikalı</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="booking-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Randevu Sistemi</h3>
+          </div>
+          <div class="card-content">
+            <div class="feature-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Ücretsiz Ön Görüşme</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Online Toplantı</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Toplantı Sonrası Detaylı Rapor</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-check-circle"></i>
+              <span>Hızlı Destek</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced Process Section -->
+<section class="process-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-badge">
+        <i class="fas fa-cogs"></i>
+        <span>Çalışma Süreci</span>
+      </div>
+      <h2 class="section-title">Nasıl <span class="gradient-text">Çalışıyoruz?</span></h2>
+      <p class="section-subtitle">Şeffaf, adım adım profesyonel süreç</p>
+    </div>
+    <div class="process-steps">
+      <div class="process-step" data-step="1">
+        <div class="step-visual">
+          <div class="step-number">1</div>
+          <div class="step-icon">
+            <i class="fas fa-comments"></i>
+          </div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Ücretsiz Ön Görüşme</h3>
+          <p>İhtiyaçlarınızı detaylı olarak dinler, mevcut durumunuzu analiz ederiz.</p>
+          <div class="step-features">
+            <span class="feature-tag">10 Dakika</span>
+            <span class="feature-tag">Online</span>
+            <span class="feature-tag">Ücretsiz</span>
+          </div>
+        </div>
+      </div>
+      <div class="process-step" data-step="2">
+        <div class="step-visual">
+          <div class="step-number">2</div>
+          <div class="step-icon">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Plan & Teklif Hazırlama</h3>
+          <p>Size özel çözüm planı hazırlar, detaylı ücret teklifi sunarız.</p>
+          <div class="step-features">
+            <span class="feature-tag">24 Saat İçinde</span>
+            <span class="feature-tag">Detaylı Rapor</span>
+            <span class="feature-tag">Şeffaf Fiyat</span>
+          </div>
+        </div>
+      </div>
+      <div class="process-step" data-step="3">
+        <div class="step-visual">
+          <div class="step-number">3</div>
+          <div class="step-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Anlaşma & Başlangıç</h3>
+          <p>Onayınız sonrası toplantı linkini iletir, çalışmaya başlarız.</p>
+          <div class="step-features">
+            <span class="feature-tag">Hızlı Başlangıç</span>
+            <span class="feature-tag">Online Toplantı</span>
+            <span class="feature-tag">Anında Erişim</span>
+          </div>
+        </div>
+      </div>
+      <div class="process-step" data-step="4">
+        <div class="step-visual">
+          <div class="step-number">4</div>
+          <div class="step-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+        </div>
+        <div class="step-content">
+          <h3>Uygulama & Takip</h3>
+          <p>İşleri tamamlar, düzenli raporlama ve sürekli destek sağlarız.</p>
+          <div class="step-features">
+            <span class="feature-tag">Sürekli Takip</span>
+            <span class="feature-tag">Düzenli Rapor</span>
+            <span class="feature-tag">Hızlı Destek</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services Overview -->
+<section class="services-overview">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Sunduğumuz <span class="gradient-text">Hizmetler</span></h2>
+      <p class="section-subtitle">İhtiyacınıza uygun profesyonel muhasebe çözümleri</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-calculator"></i>
+        </div>
+        <h3>Muhasebe Danışmanlığı</h3>
+        <p>Genel muhasebe işlemleri, defter tutma, beyanname hazırlama</p>
+        <div class="service-features">
+          <span><i class="fas fa-check"></i> Gelir Tablosu</span>
+          <span><i class="fas fa-check"></i> Bilanço</span>
+          <span><i class="fas fa-check"></i> Nakit Akışı</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <h3>Vergi Danışmanlığı</h3>
+        <p>Vergi planlaması, beyanname hazırlama, vergi optimizasyonu</p>
+        <div class="service-features">
+          <span><i class="fas fa-check"></i> KDV Beyannamesi</span>
+          <span><i class="fas fa-check"></i> Gelir Vergisi</span>
+          <span><i class="fas fa-check"></i> Kurumlar Vergisi</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3>Finansal Analiz</h3>
+        <p>Finansal performans analizi, büyüme stratejileri, risk yönetimi</p>
+        <div class="service-features">
+          <span><i class="fas fa-check"></i> Karlılık Analizi</span>
+          <span><i class="fas fa-check"></i> Nakit Yönetimi</span>
+          <span><i class="fas fa-check"></i> Büyüme Planı</span>
+        </div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <h3>İş Planlaması</h3>
+        <p>İş planı hazırlama, stratejik planlama, yatırım danışmanlığı</p>
+        <div class="service-features">
+          <span><i class="fas fa-check"></i> İş Planı</span>
+          <span><i class="fas fa-check"></i> Strateji</span>
+          <span><i class="fas fa-check"></i> Yatırım Analizi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Müşterilerimiz <span class="gradient-text">Ne Diyor?</span></h2>
+      <p class="section-subtitle">Başarı hikayeleri ve memnuniyet garantisi</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <div class="stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p>"Profesyonel yaklaşımları ve hızlı çözümleri ile işimizi büyük ölçüde kolaylaştırdılar. Kesinlikle tavsiye ederim."</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="author-info">
+            <h4>Ahmet Yılmaz</h4>
+            <span>Küçük İşletme Sahibi</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <div class="stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p>"Vergi konularında çok yardımcı oldular. Artık muhasebe işlerimle ilgili hiç endişelenmiyorum."</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="author-info">
+            <h4>Fatma Demir</h4>
+            <span>E-ticaret Girişimcisi</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-content">
+          <div class="stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p>"Finansal analizleri sayesinde işimizi %40 büyüttük. Harika bir ekip ve mükemmel sonuçlar."</p>
+        </div>
+        <div class="testimonial-author">
+          <div class="author-avatar">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="author-info">
+            <h4>Mehmet Kaya</h4>
+            <span>Restoran Sahibi</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Enhanced CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <div class="cta-text">
+        <div class="cta-badge">
+          <i class="fas fa-rocket"></i>
+          <span>Hemen Başlayın</span>
+        </div>
+        <h2>İlk Adım: <span class="gradient-text">Ücretsiz Ön Görüşme</span></h2>
+        <p>Talebinizi bize anlatın, en doğru çözüme birlikte karar verelim. 
+           Sadece 10 dakikanızı ayırın, işinizi büyütmeye başlayın.</p>
+        <div class="cta-benefits">
+          <div class="benefit-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Tamamen Ücretsiz</span>
+          </div>
+          <div class="benefit-item">
+            <i class="fas fa-check-circle"></i>
+            <span>10 Dakika</span>
+          </div>
+          <div class="benefit-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Online Toplantı</span>
+          </div>
+          <div class="benefit-item">
+            <i class="fas fa-check-circle"></i>
+            <span>Anında Başlangıç</span>
+          </div>
+        </div>
+      </div>
+      <div class="cta-actions">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('booking.new_appointment') }}" class="btn btn-primary btn-hero-modern">
+          <i class="fas fa-calendar-check"></i>
+          <span>Ön Görüşme Planla</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+        {% else %}
+        <a href="{{ url_for('account.login', next=url_for('booking.new_appointment')) }}" class="btn btn-primary btn-hero-modern">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Giriş Yap ve Planla</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="{{ url_for('account.register') }}" class="btn btn-outline-modern">
+          <i class="fas fa-user-plus"></i>
+          <span>Hemen Kayıt Ol</span>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Sıkça Sorulan <span class="gradient-text">Sorular</span></h2>
+      <p class="section-subtitle">Merak ettiğiniz konular hakkında bilgi alın</p>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Ön görüşme ne kadar sürer?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Ön görüşmelerimiz genellikle 10 dakika sürer. Bu süre içinde ihtiyaçlarınızı dinler ve size uygun çözümleri sunarız.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Ön görüşme ücretli mi?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Hayır, ön görüşmelerimiz tamamen ücretsizdir. Herhangi bir ücret ödemeden ihtiyaçlarınızı analiz edebiliriz.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Online toplantı nasıl yapılır?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Zoom, Teams veya Google Meet üzerinden online toplantı yapabiliriz. Size en uygun platformu seçebiliriz.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">
+          <h3>Hangi belgeleri hazırlamalıyım?</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-answer">
+          <p>Ön görüşme için özel bir belge hazırlamanıza gerek yok. Mevcut durumunuzu anlatmanız yeterli olacaktır.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

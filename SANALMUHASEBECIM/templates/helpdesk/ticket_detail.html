@@ -1,0 +1,821 @@
+{% extends "base.html" %}
+{% block title %}Ticket Detayı{% endblock %}
+{% block content %}
+<section class="section-padding helpdesk-ticket-page">
+  <div class="container-custom max-w-4xl">
+    {% set status_labels = {
+      'new': 'Yeni',
+      'open': 'Açık',
+      'closed': 'Tamamlandı',
+      'completed': 'Tamamlandı'
+    } %}
+    {% set priority_labels = {
+      'low': 'Düşük',
+      'normal': 'Normal',
+      'high': 'Yüksek',
+      'urgent': 'Acil'
+    } %}
+
+    <!-- WhatsApp-style header -->
+    <div class="whatsapp-header">
+      <div class="header-content">
+        <div class="header-left">
+          <a href="{{ url_for('helpdesk.index') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+          </a>
+          <div class="ticket-info">
+            <h1 class="ticket-title">{{ ticket.subject }}</h1>
+            <div class="ticket-meta">
+              <span class="status-badge status-{{ ticket.status }}">
+                {{ status_labels.get(ticket.status, ticket.status) }}
+              </span>
+              <span class="priority-badge priority-{{ ticket.priority }}">
+                {{ priority_labels.get(ticket.priority, ticket.priority) }}
+              </span>
+              <span class="ticket-number">#{{ ticket.id }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="header-right">
+          {% if current_user.is_authenticated and (current_user.is_admin or current_user.id == ticket.user_id) and ticket.status not in ['closed', 'completed'] %}
+            <button class="complete-btn" onclick="showCompleteConfirmation()">
+              <i class="fas fa-check"></i> Tamamla
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin controls -->
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="admin-controls">
+      <form method="post" action="{{ url_for('helpdesk.open_ticket', ticket_id=ticket.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="open-chat-btn" {% if ticket.status != 'new' %}disabled{% endif %}>
+          <i class="fas fa-comments"></i> Sohbeti Aç
+        </button>
+      </form>
+    </div>
+    {% endif %}
+
+    <!-- Custom Complete Confirmation Dialog -->
+    <div id="completeConfirmationDialog" class="complete-confirmation-dialog" style="display: none;">
+      <div class="confirmation-content">
+        <div class="confirmation-header">
+          <i class="fas fa-question-circle"></i>
+          <h3>Ticket Tamamla</h3>
+        </div>
+        <div class="confirmation-message">
+          <p>Bu ticket'ı tamamlandı olarak işaretlemek istediğinizden emin misiniz?</p>
+          <p class="confirmation-note">Bu işlem geri alınamaz ve sohbet sonlandırılır.</p>
+        </div>
+        <div class="confirmation-actions">
+          <button class="btn-cancel" onclick="hideCompleteConfirmation()">
+            <i class="fas fa-times"></i> İptal
+          </button>
+          <form method="post" action="{{ url_for('helpdesk.complete_ticket', ticket_id=ticket.id) }}" style="display: inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn-confirm" type="submit">
+              <i class="fas fa-check"></i> Tamam
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Elegant Success Message for Helpdesk -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'success' %}
+            <div class="helpdesk-success-message" id="helpdeskSuccessMessage">
+              <div class="success-content">
+                <div class="success-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-text">
+                  <h4>Başarılı!</h4>
+                  <p>{{ message }}</p>
+                </div>
+                <button class="success-close" onclick="closeHelpdeskSuccess()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Chat container -->
+    <div class="chat-container" id="chatContainer">
+      <!-- Initial message summary -->
+      {% if ticket.messages and ticket.messages|length > 0 %}
+      {% set first_msg = ticket.messages[0] %}
+      <div class="initial-message" data-mid="{{ first_msg.id }}">
+        <div class="message-content">
+          <div class="message-header">
+            <span class="author">{{ first_msg.author.name if first_msg.author else 'Sistem' }}</span>
+            <span class="time">{{ first_msg.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+          </div>
+          <div class="message-text">{{ first_msg.content }}</div>
+          {% if first_msg.attachment %}
+          <div class="message-attachment">
+            <a href="{{ first_msg.attachment.url }}" target="_blank" class="attachment-link">
+              <i class="fas fa-paperclip"></i> {{ first_msg.attachment.file_name }}
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Chat messages -->
+      {% if not (ticket.status in ['closed', 'completed'] and (not current_user.is_authenticated or not current_user.is_admin)) %}
+      <div class="chat-messages" id="chatThread" data-ticket-id="{{ ticket.id }}">
+        {% set last_date = None %}
+        {% for m in ticket.messages[1:] %}
+        {% set this_date = m.created_at.strftime('%d.%m.%Y') %}
+        {% if this_date != last_date %}
+        <div class="date-separator">
+          <span>{{ this_date }}</span>
+        </div>
+        {% set last_date = this_date %}
+        {% endif %}
+        
+        {% set msg_is_admin = m.author and m.author.is_admin %}
+        {% set me_is_admin = current_user.is_authenticated and current_user.is_admin %}
+        {% set is_me = (current_user.is_authenticated and m.author and m.author.id == current_user.id) %}
+        
+        <div class="message-wrapper {% if is_me %}message-mine{% else %}message-other{% endif %}" data-mid="{{ m.id }}">
+          <div class="message-bubble">
+            <div class="message-header">
+              <span class="author-name">{{ m.author.name if m.author else 'Sistem' }}</span>
+              <span class="message-time">{{ m.created_at.strftime('%H:%M') }}</span>
+            </div>
+            <div class="message-content">{{ m.content }}</div>
+            {% if m.attachment %}
+            <div class="message-attachment">
+              <a href="{{ m.attachment.url }}" target="_blank" class="attachment-link">
+                <i class="fas fa-paperclip"></i> {{ m.attachment.file_name }}
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="chat-completed">
+        <div class="completed-message">
+          <i class="fas fa-check-circle"></i>
+          <span>Bu ticket tamamlandı. Sohbet geçmişi kullanıcı tarafında gizlendi.</span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Message composer -->
+    {% if not (ticket.status in ['closed', 'completed'] and (not current_user.is_authenticated or not current_user.is_admin)) %}
+    <div class="message-composer" id="messageComposer">
+      {% if ticket.status == 'new' %}
+      <div class="composer-blocked">
+        {% if current_user.is_authenticated and current_user.is_admin %}
+        <i class="fas fa-lock"></i>
+        <span>Yetkilendirme gerekli. Sohbeti başlatmak için "Sohbeti Aç" butonunu kullanın.</span>
+        {% else %}
+        <i class="fas fa-clock"></i>
+        <span>Yetkili talebinizi değerlendiriyor. Lütfen yanıtı bekleyin.</span>
+        {% endif %}
+      </div>
+      {% else %}
+      <form method="post" action="{{ url_for('helpdesk.add_message', ticket_id=ticket.id) }}" id="composerForm" class="composer-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="composer-input-group">
+          <textarea 
+            name="message" 
+            rows="1" 
+            class="message-input" 
+            placeholder="Mesajınızı yazın..." 
+            id="messageInput"
+            maxlength="1000"
+          ></textarea>
+          <button class="send-button" type="submit" id="sendButton" disabled>
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+        <div class="input-counter">
+          <span id="charCount">0</span>/1000
+        </div>
+      </form>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  (function() {
+    const ticketId = {{ ticket.id }};
+    let lastId = 0;
+    let pollTimeout;
+    let isCompleted = false; // Ticket tamamlanma durumunu takip et
+    
+    // DOM elements
+    const messageInput = document.getElementById('messageInput');
+    const charCount = document.getElementById('charCount');
+    const sendButton = document.getElementById('sendButton');
+    const chat = document.getElementById('chatThread');
+    
+    // Mesaj ekleme fonksiyonu
+    function appendMessage(m) {
+      if (!m || !m.id) return;
+      
+      // Mesaj zaten var mı kontrol et
+      if (document.querySelector(`[data-mid="${m.id}"]`)) return;
+      
+      // Mesajın kendim tarafından mı gönderildiğini kontrol et
+      const isMe = m.is_me;
+      
+      // Date separator if needed
+      const lastSep = chat.querySelector('.date-separator:last-of-type span');
+      if (!lastSep || (lastSep && lastSep.textContent.trim() !== m.date)) {
+        const sep = document.createElement('div');
+        sep.className = 'date-separator';
+        sep.innerHTML = `<span>${m.date}</span>`;
+        chat.appendChild(sep);
+      }
+      
+      const wrapper = document.createElement('div');
+      wrapper.className = `message-wrapper ${isMe ? 'message-mine' : 'message-other'}`;
+      wrapper.setAttribute('data-mid', m.id);
+      
+      let attachmentHtml = '';
+      if (m.attachment_url) {
+        attachmentHtml = `
+          <div class="message-attachment">
+            <a href="${m.attachment_url}" target="_blank" class="attachment-link">
+              <i class="fas fa-paperclip"></i> ${m.attachment_name || ''}
+            </a>
+          </div>
+        `;
+      }
+      
+      wrapper.innerHTML = `
+        <div class="message-bubble">
+          <div class="message-header">
+            <span class="author-name">${m.author_name}</span>
+            <span class="message-time">${m.created_at.split(' ')[1]}</span>
+          </div>
+          <div class="message-content">${m.content.replace(/</g, '&lt;')}</div>
+          ${attachmentHtml}
+        </div>
+      `;
+      
+      chat.appendChild(wrapper);
+      chat.scrollTop = chat.scrollHeight;
+      lastId = Math.max(lastId, m.id || 0);
+    }
+
+    async function poll() {
+      if (isCompleted) return; // Tamamlanmışsa poll yapma
+      
+      try {
+        const res = await fetch(`{{ url_for('helpdesk.stream_messages', ticket_id=0) }}`.replace('/0/', '/' + ticketId + '/') + `?last_id=${lastId}`);
+        const data = await res.json();
+        if (data && Array.isArray(data.messages)) {
+          data.messages.forEach(appendMessage);
+        }
+        
+        // Ticket durumunu her poll'da kontrol et (daha sık kontrol)
+        checkTicketStatus();
+      } catch (e) {
+        console.error('Polling error:', e);
+      }
+      pollTimeout = setTimeout(poll, 2000);
+    }
+    
+    // Ticket durumunu kontrol et
+    async function checkTicketStatus() {
+      try {
+        const res = await fetch(`{{ url_for('helpdesk.ticket_status', ticket_id=0) }}`.replace('/0', '/' + ticketId));
+        if (res.ok) {
+          const data = await res.json();
+          
+          // Ticket tamamlandı mı kontrol et
+          if (data.is_completed && !isCompleted) {
+            isCompleted = true;
+            showCompletionMessage();
+            return;
+          }
+          
+          // Ticket durumu değişti mi kontrol et (new -> open)
+          if (data.status === 'open' && '{{ ticket.status }}' === 'new') {
+            // Ticket açıldı, mesaj formunu aktif hale getir
+            showMessageForm();
+            // Admin kontrollerini güncelle
+            updateAdminControls();
+          }
+          
+          // Ticket durumu değişti mi kontrol et (open -> completed/closed)
+          if ((data.status === 'completed' || data.status === 'closed') && 
+              '{{ ticket.status }}' === 'open' && !isCompleted) {
+            // Ticket aniden tamamlandı (admin tarafından)
+            isCompleted = true;
+            showCompletionMessage();
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Status check error:', e);
+      }
+    }
+    
+    // Tamamlanma mesajını göster
+    function showCompletionMessage() {
+      const chat = document.getElementById('chatThread');
+      if (!chat) return;
+      
+      // Tamamlanma mesajı ekle
+      const completionMsg = document.createElement('div');
+      completionMsg.className = 'completion-notice';
+      
+      // Admin mi yoksa kullanıcı mı tamamladı kontrol et
+      const isAdmin = {{ 'true' if current_user.is_admin else 'false' }};
+      let messageText = '';
+      
+      if (isAdmin) {
+        messageText = 'Ticket tamamlandı. Sohbet sonlandırıldı.';
+      } else {
+        messageText = 'Bu ticket yetkili tarafından tamamlandı. Sohbet sonlandırıldı.';
+      }
+      
+      completionMsg.innerHTML = `
+        <div class="completion-message">
+          <i class="fas fa-check-circle"></i>
+          <span>${messageText}</span>
+        </div>
+      `;
+      
+      chat.appendChild(completionMsg);
+      
+      // 3 saniye sonra yönlendir
+      setTimeout(() => {
+        window.location.href = '{{ url_for("helpdesk.index") }}';
+      }, 3000);
+      
+      // Poll'i durdur
+      clearTimeout(pollTimeout);
+    }
+    
+    // Sayfa yüklendiğinde mevcut mesajları göster ve lastId'yi ayarla
+    function loadInitialMessages() {
+      const messages = document.querySelectorAll('.message-wrapper');
+      if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        const messageId = lastMessage.getAttribute('data-mid');
+        if (messageId) {
+          lastId = Math.max(lastId, parseInt(messageId));
+        }
+      }
+      
+      // İlk mesajın ID'sini de al (eğer varsa)
+      const firstMessage = document.querySelector('.initial-message');
+      if (firstMessage && firstMessage.getAttribute('data-mid')) {
+        const firstId = parseInt(firstMessage.getAttribute('data-mid'));
+        lastId = Math.max(lastId, firstId);
+      }
+    }
+    
+    // İlk yükleme
+    loadInitialMessages();
+    
+    // Mark seen immediately to clear badges
+    fetch(`{{ url_for('helpdesk.mark_seen', ticket_id=0) }}`.replace('/0/', `/${ticketId}/`), {method:'POST'});
+    
+    // Ticket zaten tamamlanmış mı kontrol et
+    if ('{{ ticket.status }}' === 'completed' || '{{ ticket.status }}' === 'closed') {
+      isCompleted = true;
+      showCompletionMessage();
+    } else {
+      poll();
+    }
+
+    // Sayfa yüklendiğinde mevcut form varsa event listener'ları kur
+    if (document.getElementById('composerForm')) {
+      setupMessageForm();
+    }
+
+    // Mesaj formunu göster (ticket açıldığında)
+    function showMessageForm() {
+      const composer = document.getElementById('messageComposer');
+      if (!composer) return;
+      
+      // Bloke edilmiş mesajı kaldır
+      const blockedMessage = composer.querySelector('.composer-blocked');
+      if (blockedMessage) {
+        blockedMessage.remove();
+      }
+      
+      // Mesaj formunu ekle
+      if (!composer.querySelector('#composerForm')) {
+        const formHtml = `
+          <form method="post" action="{{ url_for('helpdesk.add_message', ticket_id=ticket.id) }}" id="composerForm" class="composer-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="composer-input-group">
+              <textarea 
+                name="message" 
+                rows="1" 
+                class="message-input" 
+                placeholder="Mesajınızı yazın..." 
+                id="messageInput"
+                maxlength="1000"
+              ></textarea>
+              <button class="send-button" type="submit" id="sendButton" disabled>
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            <div class="input-counter">
+              <span id="charCount">0</span>/1000
+            </div>
+          </form>
+        `;
+        composer.innerHTML = formHtml;
+        
+        // Form event listener'larını tekrar ekle
+        setupMessageForm();
+      }
+    }
+    
+    // Admin kontrollerini güncelle
+    function updateAdminControls() {
+      const adminControls = document.querySelector('.admin-controls');
+      if (adminControls) {
+        const openButton = adminControls.querySelector('.open-chat-btn');
+        if (openButton) {
+          openButton.disabled = true;
+          openButton.innerHTML = '<i class="fas fa-check"></i> Sohbet Açıldı';
+          openButton.classList.add('opened');
+        }
+      }
+    }
+    
+    // Mesaj formu event listener'larını kur
+    function setupMessageForm() {
+      const messageInput = document.getElementById('messageInput');
+      const charCount = document.getElementById('charCount');
+      const sendButton = document.getElementById('sendButton');
+      
+      if (!messageInput || !charCount || !sendButton) return;
+      
+      // Character counter
+      messageInput.addEventListener('input', function() {
+        const length = this.value.length;
+        charCount.textContent = length;
+        
+        if (sendButton) {
+          sendButton.disabled = length === 0;
+          sendButton.classList.toggle('active', length > 0);
+        }
+      });
+      
+      // Auto-resize textarea
+      messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+      
+      // Submit form without full reload
+      const form = document.getElementById('composerForm');
+      if (form) {
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          if (sendButton) sendButton.disabled = true;
+          
+          const fd = new FormData(form);
+          const response = await fetch(form.action, { method: 'POST', body: fd });
+          
+          if (response.ok) {
+            // Mesaj başarıyla gönderildiyse, kısa bir süre sonra poll yap
+            setTimeout(() => {
+              poll();
+            }, 500);
+          }
+          
+          if (messageInput) messageInput.value = '';
+          if (messageInput) messageInput.style.height = 'auto';
+          if (charCount) charCount.textContent = '0';
+          if (sendButton) {
+            sendButton.disabled = true;
+            sendButton.classList.remove('active');
+          }
+          
+          // Refresh global unread badge
+          if (window.refreshHelpdeskUnread) window.refreshHelpdeskUnread();
+        });
+      }
+    }
+  })();
+
+  // Helpdesk Success Message Functions
+  function closeHelpdeskSuccess() {
+    const successMessage = document.getElementById('helpdeskSuccessMessage');
+    if (successMessage) {
+      successMessage.style.opacity = '0';
+      setTimeout(() => {
+        successMessage.style.display = 'none';
+      }, 300);
+    }
+  }
+
+  // Auto-hide success message after 5 seconds
+  setTimeout(() => {
+    const successMessage = document.getElementById('helpdeskSuccessMessage');
+    if (successMessage) {
+      closeHelpdeskSuccess();
+    }
+  }, 5000);
+
+  // Complete Confirmation Dialog Functions
+  function showCompleteConfirmation() {
+    const dialog = document.getElementById('completeConfirmationDialog');
+    if (dialog) {
+      dialog.style.display = 'flex';
+      // Add backdrop effect
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function hideCompleteConfirmation() {
+    const dialog = document.getElementById('completeConfirmationDialog');
+    if (dialog) {
+      dialog.style.display = 'none';
+      // Restore scroll
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  // Close dialog when clicking outside
+  document.addEventListener('click', function(event) {
+    const dialog = document.getElementById('completeConfirmationDialog');
+    if (dialog && event.target === dialog) {
+      hideCompleteConfirmation();
+    }
+  });
+</script>
+
+<style>
+/* Elegant Helpdesk Success Message */
+.helpdesk-success-message {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 16px;
+  margin: 1rem 0;
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+  animation: slideInDown 0.4s ease-out;
+  overflow: hidden;
+}
+
+.success-content {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  gap: 1rem;
+  position: relative;
+}
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.success-icon i {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.success-text {
+  flex: 1;
+  color: white;
+}
+
+.success-text h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+}
+
+.success-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+.success-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.success-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.success-close i {
+  font-size: 0.9rem;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .helpdesk-success-message {
+    margin: 0.75rem 0;
+  }
+  
+  .success-content {
+    padding: 1rem 1.25rem;
+    gap: 0.75rem;
+  }
+  
+  .success-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .success-icon i {
+    font-size: 1.25rem;
+  }
+  
+  .success-text h4 {
+    font-size: 1rem;
+  }
+  
+  .success-text p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Complete Confirmation Dialog */
+.complete-confirmation-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.confirmation-content {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: slideInUp 0.3s ease-out;
+}
+
+.confirmation-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.confirmation-header i {
+  font-size: 3rem;
+  color: #f59e0b;
+  margin-bottom: 1rem;
+}
+
+.confirmation-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.confirmation-message {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.confirmation-message p {
+  margin: 0 0 0.75rem 0;
+  color: #4b5563;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.confirmation-note {
+  color: #6b7280 !important;
+  font-size: 0.9rem !important;
+  font-style: italic;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-cancel, .btn-confirm {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.btn-cancel:hover {
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile responsive for confirmation dialog */
+@media (max-width: 480px) {
+  .confirmation-content {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .confirmation-actions {
+    flex-direction: column;
+  }
+  
+  .btn-cancel, .btn-confirm {
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

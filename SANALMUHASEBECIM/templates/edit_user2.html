@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Edit User: {{ user.name }}</h2>
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-floating mb-3">
+            {{ form.name(placeholder='Name', class='form-control') }}
+            <label for="name">Name</label>
+        </div>
+        <div class="form-floating mb-3">
+            {{ form.email(placeholder='Email Address', class='form-control') }}
+            <label for="email">Email Address</label>
+        </div>
+        <div class="form-check">
+            {{ form.is_admin() }}
+            <label class="form-check-label" for="is_admin">Is Admin</label>
+        </div>
+        <div class="text-left">
+            {{ form.submit(class='btn btn-primary') }}
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Hizmet Formu{% endblock %}
+{% block content %}
+<section class="section-padding">
+  <div class="container-custom max-w-3xl">
+    <div class="card">
+      <h1 class="text-2xl font-bold mb-6">Hizmet</h1>
+      <form method="post" class="space-y-4">
+        {{ form.hidden_tag() }}
+        <div>
+          <label class="form-label">Ad</label>
+          {{ form.name(class_='form-input') }}
+        </div>
+        <div>
+          <label class="form-label">Slug</label>
+          {{ form.slug(class_='form-input') }}
+        </div>
+        <div>
+          <label class="form-label">Özet</label>
+          {{ form.summary(class_='form-input') }}
+        </div>
+        <div>
+          <label class="form-label">Açıklama</label>
+          {{ form.description(class_='form-input', rows=6) }}
+        </div>
+        <div>
+          <label class="form-label">Fiyat</label>
+          {{ form.price(class_='form-input') }}
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex items-center space-x-2">{{ form.is_active() }}<label>Aktif</label></div>
+          <div>
+            <label class="form-label">Sıra</label>
+            {{ form.order_index(class_='form-input') }}
+          </div>
+        </div>
+        <button class="btn-primary" type="submit">Kaydet</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

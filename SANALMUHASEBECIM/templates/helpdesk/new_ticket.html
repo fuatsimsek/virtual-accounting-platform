@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Yeni Ticket{% endblock %}
+{% block content %}
+<section class="section-padding helpdesk-new-page">
+  <div class="container-custom max-w-3xl">
+    <div class="mb-3">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-md text-white"
+              style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); box-shadow: 0 3px 8px rgba(14,165,233,0.18);">
+          <i class="fas fa-life-ring text-[11px]"></i>
+        </span>
+        <div>
+          <h1 class="text-lg font-semibold leading-snug">Yeni Ticket</h1>
+          <p class="text-gray-600 text-[12px]">Kısa ve net yazın; en kısa sürede dönüş yapacağız.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-3">
+      <!-- Form -->
+      <div class="md:col-span-2">
+        <div class="p-[1px] rounded-lg" style="background: linear-gradient(135deg, #e5f0ff 0%, #efeaff 100%);">
+          <div class="card p-3 rounded-lg bg-white" style="box-shadow: 0 6px 18px rgba(2,6,23,0.06);">
+          <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-2 info-note text-[12px] text-gray-600">
+              <strong class="text-gray-800">Doğru konuyu seçin:</strong> Talebinizin hızlı ve doğru ekip tarafından ele alınması için aşağıdan en uygun konuyu seçin.
+            </div>
+
+            <div class="grid gap-2 md:grid-cols-2">
+              <div>
+                <label class="form-label text-[13px]">Konu Seçimi</label>
+                <select name="topic" class="form-input text-sm" required>
+                  <option value="" disabled {% if not pre_topic %}selected{% endif %}>Bir konu seçin</option>
+                  <option value="Teknik Destek" {% if pre_topic=='Teknik Destek' %}selected{% endif %}>Teknik Destek</option>
+                  <option value="Fatura & Muhasebe" {% if pre_topic=='Fatura & Muhasebe' %}selected{% endif %}>Fatura & Muhasebe</option>
+                  <option value="Ödeme & Fiyatlandırma" {% if pre_topic=='Ödeme & Fiyatlandırma' %}selected{% endif %}>Ödeme & Fiyatlandırma</option>
+                  <option value="Randevu & Görüşme" {% if pre_topic=='Randevu & Görüşme' %}selected{% endif %}>Randevu & Görüşme</option>
+                  <option value="Hizmet Talebi" {% if pre_topic=='Hizmet Talebi' %}selected{% endif %}>Hizmet Talebi</option>
+                  <option value="Diğer" {% if pre_topic=='Diğer' %}selected{% endif %}>Diğer</option>
+                </select>
+                <small class="text-[11px] text-gray-500">Yanlış konu seçimi işlem süresini uzatabilir.</small>
+              </div>
+              <div class="md:col-span-2">
+                <label class="form-label text-[13px]">Konu</label>
+                <input name="subject" maxlength="120" class="form-input text-sm" placeholder="Örn: Fatura yüklenmiyor" value="{{ pre_subject }}" required />
+                <small class="text-[11px] text-gray-500">En fazla 120 karakter.</small>
+                
+              </div>
+
+              <div>
+                <label class="form-label text-[13px]">Öncelik</label>
+                <select name="priority" class="form-input text-sm">
+                  <option value="normal" {% if pre_priority=='normal' or not pre_priority %}selected{% endif %}>Normal</option>
+                  <option value="high" {% if pre_priority=='high' %}selected{% endif %}>Yüksek</option>
+                  <option value="urgent" {% if pre_priority=='urgent' %}selected{% endif %}>Acil</option>
+                </select>
+                
+              </div>
+            </div>
+
+            <div class="mt-2">
+              <label class="form-label text-[13px]">Mesaj</label>
+              <textarea id="ticket-message" name="message" rows="6" maxlength="2000" class="form-input text-sm" placeholder="Kısaca özet, beklenen durum ve varsa hata çıktısı/link ekleyin." required>{{ pre_message }}</textarea>
+              <div class="flex items-center justify-between mt-1">
+                <small class="text-[11px] text-gray-500">Gizli bilgiler paylaşmayın.</small>
+                <small id="message-counter" class="text-[11px] text-gray-500">0 / 2000</small>
+              </div>
+            </div>
+
+            <div class="mt-2">
+              <label class="form-label text-[13px]">Dosya (opsiyonel)</label>
+              <input type="file" name="attachment" class="form-input text-sm" accept="{{ accept_attr }}">
+              <small class="text-gray-500 text-[11px]">Desteklenen: {{ allowed_text }}</small>
+            </div>
+
+            <div class="mt-3 flex items-center justify-end gap-2">
+              <a href="{{ url_for('helpdesk.index') }}" class="btn-soft text-sm"><i class="fas fa-arrow-left"></i> Geri</a>
+              <button class="btn-pill blue text-sm" type="submit">
+                <i class="fas fa-paper-plane text-[11px]"></i> Gönder
+              </button>
+            </div>
+          </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bilgi Paneli -->
+      <div>
+        <div class="card p-4" style="background: linear-gradient(135deg, #f8fbff 0%, #f8f7ff 100%); box-shadow: 0 6px 18px rgba(2,6,23,0.06);">
+          <h2 class="text-[13px] font-semibold mb-2"><i class="fas fa-lightbulb text-yellow-500"></i> İpuçları</h2>
+          <ul class="text-[12px] text-gray-600 space-y-1">
+            <li>• Konuyu kısa ve net yazın.</li>
+            <li>• Mesajda adım adım ilerleyin.</li>
+            <li>• Ekran görüntüsü veya link ekleyin.</li>
+          </ul>
+          <hr class="my-3">
+          <h3 class="text-[13px] font-semibold mb-1"><i class="fas fa-flag"></i> Öncelik Bilgisi</h3>
+          <p class="text-[12px] text-gray-600">Acil durumlarda “Acil” önceliğini seçin. Normal taleplerde hızlı dönüş sağlanır.</p>
+          <hr class="my-3">
+          <h3 class="text-[13px] font-semibold mb-1"><i class="fas fa-headset"></i> Destek</h3>
+          <p class="text-[12px] text-gray-600">E-posta: <a href="mailto:info@sanalmuhasebem.net" class="text-primary-600 hover:underline">info@sanalmuhasebem.net</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

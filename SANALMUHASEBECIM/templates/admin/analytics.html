@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+{% block title %}Kullanıcı Aktivite Özeti - Admin{% endblock %}
+{% block meta_description %}Sistem kullanıcılarının aktivite özeti ve istatistikleri.{% endblock %}
+{% block content %}
+
+<style>
+  /* Başlıkların yatay görünmesi için zorunlu hizalama */
+  .analytics-table th { white-space: nowrap; }
+  .th-inline { display: inline-flex; align-items: center; gap: 6px; flex-direction: row !important; }
+  /* Sticky header ve kompakt kolonlar */
+  .table-responsive { overflow-x: auto; }
+  .analytics-table thead th { position: sticky; top: 0; background: #fff; z-index: 5; box-shadow: 0 1px 0 #e5e7eb; }
+  /* Override global flex on th to keep headers horizontal */
+  .analytics-table th { display: table-cell !important; vertical-align: middle; white-space: nowrap; gap: 0 !important; text-align: left; }
+  .analytics-table .col-narrow { width: 100px; text-align: center; }
+  .analytics-table .col-date { width: 140px; white-space: nowrap; }
+  .analytics-table th i { font-size: 12px; }
+  .analytics-table th, .analytics-table td { padding: 10px 12px; }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section hero-services">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Kullanıcı <span class="highlight">Analitikleri</span></h1>
+        <p class="hero-subtitle">Sistem kullanıcılarının aktivite özeti ve detaylı istatistikleri</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Analytics Section -->
+<section class="services-grid-section">
+  <div class="container">
+    <div class="analytics-card">
+      <div class="analytics-header">
+        <h2 class="analytics-title">
+          <i class="fas fa-chart-bar"></i>
+          Kullanıcı Aktivite Özeti
+        </h2>
+        <p class="analytics-subtitle">Gönderi, yorum ve randevu sayıları</p>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="analytics-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th><span class="th-inline"><i class="fas fa-user"></i><span>Kullanıcı Adı</span></span></th>
+              <th><span class="th-inline"><i class="fas fa-envelope"></i><span>E-posta</span></span></th>
+              <th class="col-narrow"><span class="th-inline"><i class="fas fa-newspaper"></i><span>Gönderi</span></span></th>
+              <th class="col-narrow"><span class="th-inline"><i class="fas fa-comments"></i><span>Yorum</span></span></th>
+              <th class="col-narrow"><span class="th-inline"><i class="fas fa-calendar-check"></i><span>Randevu</span></span></th>
+              <th class="col-date"><span class="th-inline"><i class="fas fa-calendar-plus"></i><span>Kayıt Tarihi</span></span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in user_activity %}
+            <tr class="analytics-row">
+              <td>
+                {% if row.profile_photo %}
+                <img src="{{ row.profile_photo }}" alt="{{ row.name }}" style="width:32px;height:32px;border-radius:999px;object-fit:cover;box-shadow:0 0 0 1px #e5e7eb;">
+                {% else %}
+                <div style="width:32px;height:32px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#e5e7eb;color:#64748b;">
+                  <i class="fas fa-user"></i>
+                </div>
+                {% endif %}
+              </td>
+              <td class="user-info">
+                <span class="user-name">{{ row.name }}</span>
+              </td>
+              <td class="user-email">{{ row.email }}</td>
+              <td class="stat-cell">
+                <span class="stat-badge stat-posts">{{ row.post_count }}</span>
+              </td>
+              <td class="stat-cell">
+                <span class="stat-badge stat-comments">{{ row.comment_count }}</span>
+              </td>
+              <td class="stat-cell">
+                <span class="stat-badge stat-appointments">{{ row.appointment_count }}</span>
+              </td>
+              <td class="date-cell">
+                <i class="fas fa-calendar"></i>
+                {{ row.created_at.strftime('%d.%m.%Y') if row.created_at and row.created_at.strftime is defined else (row.created_at[:10] if row.created_at else '-') }}
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-content">
+                  <i class="fas fa-chart-line"></i>
+                  <p>Henüz kullanıcı aktivite verisi bulunmuyor.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Summary Cards -->
+<section class="summary-section">
+  <div class="container">
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Toplam Kullanıcı</h3>
+          <p class="summary-number">{{ user_activity|length }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Toplam Gönderi</h3>
+          <p class="summary-number">{{ user_activity|sum(attribute='post_count') }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-comments"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Toplam Yorum</h3>
+          <p class="summary-number">{{ user_activity|sum(attribute='comment_count') }}</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="summary-content">
+          <h3>Toplam Randevu</h3>
+          <p class="summary-number">{{ user_activity|sum(attribute='appointment_count') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
