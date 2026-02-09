@@ -155,52 +155,132 @@ These helper routes are kept for local testing and screenshot flow. Remove them 
 
 ## Screenshots
 
-The project includes real UI screenshots in the `assets` folder.
-Below is a curated gallery with readable English file names.
+The product flow below follows a realistic user journey from first visit to admin operations.
 
-### Public and Authentication
+### 1) First Contact and Onboarding
+
+**Homepage**  
+Main landing experience where users understand services and platform value.
 
 ![Homepage](assets/homepage.png)
+
+**Homepage (Alternative UI)**  
+An alternative homepage layout used during UI iteration.
+
 ![Homepage New Layout](assets/homepage-new-layout.png)
-![Login Page](assets/login-page.png)
-![Admin Login](assets/admin-login.png)
+
+**Register Page**  
+New users create an account and enter the client flow.
+
 ![Register Page](assets/register-page.png)
 
-### Admin Area
+**Login Page**  
+Standard user authentication entry point.
 
-![Admin Dashboard](assets/admin-dashboard.png)
-![Admin Control Panel](assets/admin-control-panel.png)
-![Admin Analytics](assets/admin-analytics-page.png)
-![Leads Management](assets/leads-management.png)
-![Admin Ticket Management](assets/admin-ticket-management.png)
-![Admin Appointment Check](assets/admin-appointment-check.png)
+![Login Page](assets/login-page.png)
 
-### Blog and Content
+### 2) User Experience After Login
 
-![Create Post Step 1](assets/create-post-step-1.png)
-![Create Post Step 2](assets/create-post-step-2.png)
-![Admin Post Management](assets/admin-post-management.png)
-![Admin Post Management Alternative](assets/admin-post-management-alt.png)
+**Profile Page**  
+Users manage personal and account-related details.
 
-### Services, Booking, and Helpdesk
+![Profile Page](assets/profile-page.png)
 
-![Consultancy Page Details](assets/consultancy-page-details.png)
+**My Services Page**  
+Users can view assigned services and service lifecycle status.
+
 ![My Services Page](assets/my-services-page.png)
+
+**Service Detail Page**  
+Detailed operational/service-level view for a selected service.
+
 ![User Service Detail Page](assets/user-service-detail-page.png)
-![Open Ticket Page](assets/open-ticket-page.png)
-![Ticket List Page](assets/ticket-list-page.png)
-![Helpdesk Chat](assets/helpdesk-chat.png)
+
+**User Service Status Check**  
+Quick status visibility for active service requests.
+
+![User Service Status Check](assets/user-service-status-check.png)
+
+### 3) Booking and Support Workflow
+
+**Schedule Meeting (Step 1)**  
+User starts appointment booking flow.
+
 ![Schedule Meeting Step 1](assets/schedule-meeting-step-1.png)
+
+**Schedule Meeting (Step 2)**  
+User finalizes booking details and submission.
+
 ![Schedule Meeting Step 2](assets/schedule-meeting-step-2.png)
 
-### Notifications and Communication
+**Open Ticket**  
+Support issue creation for operational helpdesk process.
+
+![Open Ticket Page](assets/open-ticket-page.png)
+
+**Ticket List**  
+Users track open/closed ticket history.
+
+![Ticket List Page](assets/ticket-list-page.png)
+
+**Helpdesk Chat**  
+Ticket conversation and back-and-forth support messaging.
+
+![Helpdesk Chat](assets/helpdesk-chat.png)
+
+### 4) Admin Operations and Control
+
+**Admin Login**  
+Dedicated entry for admin-level access.
+
+![Admin Login](assets/admin-login.png)
+
+**Admin Dashboard**  
+Top-level overview of platform activity and navigation.
+
+![Admin Dashboard](assets/admin-dashboard.png)
+
+**Admin Control Panel**  
+Central management area for operational actions.
+
+![Admin Control Panel](assets/admin-control-panel.png)
+
+**Leads Management**  
+Admin tracking for lead pipeline and conversion state.
+
+![Leads Management](assets/leads-management.png)
+
+**Admin Analytics**  
+User activity and engagement metrics for decision support.
+
+![Admin Analytics](assets/admin-analytics-page.png)
+
+**Admin Ticket Management**  
+Support queue control and resolution monitoring.
+
+![Admin Ticket Management](assets/admin-ticket-management.png)
+
+### 5) Content and Communication Layer
+
+**Create Post (Step 1)**  
+Initial stage of content creation in admin blog workflow.
+
+![Create Post Step 1](assets/create-post-step-1.png)
+
+**Create Post (Step 2)**  
+Completion stage before publication/update.
+
+![Create Post Step 2](assets/create-post-step-2.png)
+
+**Post Management**  
+Editorial list and update controls for published content.
+
+![Admin Post Management](assets/admin-post-management.png)
+
+**Email Template Preview**  
+Transactional email style used in account and workflow notifications.
 
 ![Email Template Preview](assets/email-template-preview.png)
-![Dynamic Notification](assets/dynamic-notification.png)
-![Subscription Alert](assets/subscription-alert.png)
-![Appointment Confirmation](assets/appointment-confirmation.png)
-![New Service Requires Initial Email Confirmation](assets/new-service-requires-initial-email-confirmation.png)
-![Single Service Application Submitted](assets/single-service-application-submitted.png)
 
 ---
 
