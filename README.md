@@ -282,6 +282,63 @@ Transactional email style used in account and workflow notifications.
 
 ![Email Template Preview](assets/email-template-preview.png)
 
+### 6) Additional UI States and Workflow Screens
+
+**Admin Appointment Check**  
+Admin-side review state for appointment processing.
+
+![Admin Appointment Check](assets/admin-appointment-check.png)
+
+**Admin Created New Service**  
+Operational screen after creating a new service offering.
+
+![Admin Created New Service](assets/admin-created-new-service.png)
+
+**Post Management (Alternative State)**  
+Alternative content state in blog management flow.
+
+![Admin Post Management Alternative](assets/admin-post-management-alt.png)
+
+**Appointment Confirmation**  
+Confirmation state shown after appointment-related action.
+
+![Appointment Confirmation](assets/appointment-confirmation.png)
+
+**Comment System**  
+User interaction layer for content engagement.
+
+![Comment System](assets/comment-system.png)
+
+**Consultancy Page Details**  
+Detailed consultancy/service explanation page.
+
+![Consultancy Page Details](assets/consultancy-page-details.png)
+
+**Dynamic Notification**  
+In-app notification behavior example.
+
+![Dynamic Notification](assets/dynamic-notification.png)
+
+**Footer Section**  
+Global footer area and informational links block.
+
+![Footer Section](assets/footer-section.png)
+
+**New Service Requires Initial Email Confirmation**  
+State where email confirmation is required before service progression.
+
+![New Service Requires Initial Email Confirmation](assets/new-service-requires-initial-email-confirmation.png)
+
+**Single Service Application Submitted**  
+Submission state for single-service application flow.
+
+![Single Service Application Submitted](assets/single-service-application-submitted.png)
+
+**Subscription Alert**  
+Subscription feedback/alert interface example.
+
+![Subscription Alert](assets/subscription-alert.png)
+
 ---
 
 ## Email Templates
